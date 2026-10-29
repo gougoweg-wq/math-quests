@@ -7,7 +7,9 @@
 .tower{position:absolute;left:38%;bottom:22px;display:flex;flex-direction:column-reverse;gap:2px}
 .tower i{display:block;width:70px;height:16px;border-radius:4px;animation:drop .4s cubic-bezier(.3,1.5,.5,1)}@keyframes drop{from{transform:translateY(-120px);opacity:0}}
 .sun{position:absolute;right:20px;top:14px;font-size:44px}</style>
-<link rel="stylesheet" href="base.css"></head><body>
+<link rel="stylesheet" href="base.css">
+<style>.wrap .stage{height:clamp(240px,46vw,340px)}.stage canvas{display:block;width:100%;height:100%}.stage .cnt{position:absolute;right:14px;top:12px;font:800 22px var(--fd);background:#fff;border-radius:999px;padding:4px 14px;box-shadow:0 3px 0 #c9d8e8}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script></head><body>
 <script>
 const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[Math.floor(Math.random()*a.length)];
 const ICONS=['🍎','⭐','🐞','🍪','🚗','⚽','🧱','🍓'];
@@ -20,6 +22,40 @@ levels:[
  {name:'На 5 и 10',n:8,gen(){const a=pick([5,10]),b=R(1,10);return {q:a+' · '+b,a:a*b,hint:a===10?'Припиши ноль: '+b+'0':'Считай пятёрками: 5, 10, 15…',kind:'Таблица на 5 и 10'}}},
  {name:'На 3',n:6,gen(){const b=R(1,10);return {q:'3 · '+b,a:3*b,hint:'Считай тройками: 3, 6, 9…',visual:b<=5?arr(3,b):null,kind:'Таблица на 3'}}},
  {name:'Задачи',n:5,gen(){return pick([()=>{const n=R(2,6);return {q:'У '+n+' котиков по 2 уха. Сколько ушей?',a:2*n,hint:n+' раз по 2',kind:'Задачи'}},()=>{const n=R(2,6);return {q:n+' пачек, в каждой 5 карандашей. Сколько карандашей?',a:5*n,hint:n+' раз по 5',kind:'Задачи'}},()=>{const n=R(2,5);return {q:'У '+n+' машинок по 4 колеса. Сколько колёс?',a:4*n,hint:'4 + 4 + … ('+n+' раз)',visual:arr(n,4),kind:'Задачи'}}])()}}],
-onLevel(st){st.innerHTML='<div class="sun">☀️</div><div class="robot">🤖</div><div class="tower" id="tower"></div>'},
-onCorrect(){const t=document.getElementById('tower');const c=['#ff7a29','#3aa0ff','#ffd23f','#1fa35a','#b06cff'];const i=document.createElement('i');i.style.background=c[t.children.length%c.length];t.append(i)}};
-</script><script src="engine.js"></script></body></html>
+onLevel(st){window.R3D?R3D.reset():(window._pendingReset=true)},
+onCorrect(){window.R3D&&R3D.block()},
+onWrong(){window.R3D&&R3D.no()}};
+</script><script src="engine.js"></script><script>addEventListener("load",()=>{const p=document.createElement("p");p.className="small";p.textContent="3D-робот: Quaternius, Poly Pizza (CC0)";document.querySelector(".wrap").append(p)})</script>
+<script type="module">
+import * as THREE from 'three';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+const st=document.getElementById('stage');let r;try{r=new THREE.WebGLRenderer({antialias:true,alpha:true})}catch(e){}
+if(r){r.setPixelRatio(Math.min(devicePixelRatio,2));r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;st.innerHTML='';st.append(r.domElement);const cnt=document.createElement('div');cnt.className='cnt';cnt.textContent='🧱 0';st.append(cnt);
+const sc=new THREE.Scene();sc.background=new THREE.Color(0xbfe6ff);sc.fog=new THREE.Fog(0xbfe6ff,14,30);
+const cam=new THREE.PerspectiveCamera(38,1,.1,80);
+sc.add(new THREE.HemisphereLight(0xffffff,0x88b070,1.3));const sun=new THREE.DirectionalLight(0xffffff,2.4);sun.position.set(4,8,5);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-6,right:6,top:8,bottom:-2});sc.add(sun);
+const ground=new THREE.Mesh(new THREE.CircleGeometry(16,48),new THREE.MeshStandardMaterial({color:0x8fd16a,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;sc.add(ground);
+const pad=new THREE.Mesh(new THREE.CylinderGeometry(1,1.1,.12,32),new THREE.MeshStandardMaterial({color:0xd8d2c4}));pad.position.set(1.4,.06,0);pad.receiveShadow=true;sc.add(pad);
+for(let i=0;i<14;i++){const t=new THREE.Group();const h=.6+Math.random()*.6;const tr=new THREE.Mesh(new THREE.CylinderGeometry(.08,.1,h,8),new THREE.MeshStandardMaterial({color:0x8a5a33}));tr.position.y=h/2;const cr=new THREE.Mesh(new THREE.IcosahedronGeometry(.45+Math.random()*.25,0),new THREE.MeshStandardMaterial({color:[0x4caf50,0x66bb6a,0x2e8b57][i%3],flatShading:true}));cr.position.y=h+.3;t.add(tr,cr);const a=i/14*Math.PI*2;t.position.set(Math.cos(a)*(7+Math.random()*3),0,Math.sin(a)*(7+Math.random()*3)-2);t.traverse(o=>o.castShadow=true);sc.add(t)}
+const clouds=[];for(let i=0;i<5;i++){const c=new THREE.Group();for(let j=0;j<4;j++){const p=new THREE.Mesh(new THREE.SphereGeometry(.5+Math.random()*.3,12,10),new THREE.MeshStandardMaterial({color:0xffffff,roughness:1}));p.position.set(j*.6,Math.random()*.2,Math.random()*.3);c.add(p)}c.position.set(-8+i*4,5+Math.random()*1.5,-8);sc.add(c);clouds.push(c)}
+const COLORS=[0xff7a29,0x3aa0ff,0xffd23f,0x1fa35a,0xb06cff,0xff4f8b];const blocks=[];const bg=new THREE.BoxGeometry(.9,.36,.9);
+let mixer=null,acts={},cur=null,robot=null;
+function play(n,once){const a=acts[n];if(!a)return;if(cur&&cur!==a)cur.fadeOut(.2);a.reset().fadeIn(.2).play();if(once){a.setLoop(THREE.LoopOnce,1);a.clampWhenFinished=true}cur=a}
+new GLTFLoader().load('models/robot.glb',g=>{robot=g.scene;robot.traverse(o=>{if(o.isMesh){o.castShadow=true}});robot.scale.setScalar(.42);robot.position.set(-1.1,0,.3);robot.rotation.y=.5;sc.add(robot);mixer=new THREE.AnimationMixer(robot);
+ g.animations.forEach(c=>{acts[c.name.split('|').pop().replace('Robot_','')]=mixer.clipAction(c)});play('Idle');
+ mixer.addEventListener('finished',()=>{if(state!=='dance')play('Idle')})});
+function resize(){const w=st.clientWidth,h=st.clientHeight;r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}new ResizeObserver(resize).observe(st);resize();
+let state='idle',t0=performance.now();
+window.R3D={reset(){blocks.forEach(b=>sc.remove(b));blocks.length=0;cnt.textContent='🧱 0';state='idle';play('Idle')},
+ block(){const i=blocks.length;const m=new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:COLORS[i%COLORS.length],roughness:.45}));m.castShadow=true;m.receiveShadow=true;m.position.set(1.4+(Math.random()-.5)*.08,7,0);m.rotation.y=(Math.random()-.5)*.3;m.userData={vy:0,target:.12+.18+i*.36};sc.add(m);blocks.push(m);cnt.textContent='🧱 '+blocks.length;
+  play(Math.random()<.5?'ThumbsUp':'Yes',true);if(blocks.length>=(document.querySelectorAll('.prog i').length||6)){state='dance';setTimeout(()=>play('Dance'),700)}},
+ no(){play('No',true)}};
+if(window._pendingReset)R3D.reset();
+let last=performance.now();
+function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;const time=(t-t0)/1000;mixer&&mixer.update(dt);
+ blocks.forEach(b=>{const u=b.userData;if(b.position.y>u.target||u.vy>0){u.vy-=20*dt;b.position.y+=u.vy*dt;if(b.position.y<=u.target){b.position.y=u.target;u.vy=Math.abs(u.vy)>2?-u.vy*.3:0}}});
+ clouds.forEach((c,i)=>{c.position.x+=dt*.3;if(c.position.x>12)c.position.x=-12});
+ const top=Math.max(1.2,.3+blocks.length*.36);const ang=Math.sin(time*.25)*.25;cam.position.set(Math.sin(ang)*6.2+.3,1.6+top*.45,Math.cos(ang)*6.2);cam.lookAt(.3,.8+top*.35,0);
+ if(state==='dance'&&robot)robot.rotation.y+=dt*1.2;
+ r.render(sc,cam);requestAnimationFrame(frame)}requestAnimationFrame(frame);}
+</script>
+</body></html>
