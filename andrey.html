@@ -1,12 +1,16 @@
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Взлом сейфа</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@700;800;900&display=swap">
-<style>:root{--bg:#0b0f0c;--fg:#e8ffe9;--muted:#8fb79a;--panel:#111a14;--line:#1f3a27;--accent:#35f07a;--accent2:#ffd24a;--on:#04210f;--stage:radial-gradient(ellipse at center,#16241a,#070b08);--screen:#020503;--key:#15231a;--keysh:#050a06;--ok:#35f07a;--bad:#ff5c5c;--hintbg:#18301f;--f:"Inter",system-ui,sans-serif;--fd:"Share Tech Mono",monospace;--fm:"Share Tech Mono",monospace;color-scheme:dark}
-.safe{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:150px;height:150px;border-radius:18px;background:linear-gradient(145deg,#4a5a50,#232b26);border:4px solid #0a0f0b;box-shadow:0 14px 30px rgba(0,0,0,.6)}
-.dial{position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;background:radial-gradient(#9aa69e,#4c5650);border:5px solid #1b221d;transition:transform .5s}
-.dial::after{content:"";position:absolute;left:50%;top:6px;width:4px;height:18px;margin-left:-2px;background:#35f07a;border-radius:2px}
-.leds{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:6px}.leds i{width:12px;height:12px;border-radius:50%;background:#2b3a30}.leds i.on{background:#35f07a;box-shadow:0 0 8px #35f07a}
-.safe.locked{animation:sh .4s;border-color:#ff5c5c}.safe.open .dial{transform:rotate(720deg)}
-.lockmsg{position:absolute;left:0;right:0;top:10px;text-align:center;font:900 14px "Share Tech Mono";color:#ff5c5c;letter-spacing:.1em}</style>
+<style>:root{--bg:radial-gradient(ellipse at 50% -10%,#1d2a22,#050806 70%) fixed #050806;--fg:#e8ffe9;--muted:#8fb79a;--panel:#0d1510;--line:#1f3a27;--accent:#35f07a;--accent2:#ffd24a;--on:#04210f;--stage:radial-gradient(ellipse at 50% 120%,#1a2a1f,#030504 70%);--screen:#020503;--key:#121d16;--keysh:#030604;--ok:#35f07a;--bad:#ff4d4d;--hintbg:#14271a;--f:"Inter",system-ui,sans-serif;--fd:"Share Tech Mono",monospace;--fm:"Share Tech Mono",monospace;color-scheme:dark}
+.stage{height:260px}
+.stage svg{position:absolute;inset:0;width:100%;height:100%}
+.scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#35f07a,transparent);opacity:.35;animation:scan 3.5s linear infinite}@keyframes scan{from{top:0}to{top:100%}}
+#dialG{transition:transform .6s cubic-bezier(.3,1.4,.5,1);transform-origin:300px 130px;transform-box:view-box}
+#door{transition:transform 1.2s cubic-bezier(.6,0,.3,1);transform-origin:178px 130px;transform-box:view-box}
+.open #door{transform:perspective(600px) rotateY(-75deg)}
+#alarm{opacity:0;transition:opacity .15s}.alarm #alarm{opacity:1;animation:al .5s steps(2) 6}@keyframes al{50%{opacity:.15}}
+.shake{animation:shk .4s}@keyframes shk{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+#codeTxt{font-family:"Share Tech Mono",monospace;letter-spacing:6px}
+.laser{animation:lz 1.6s ease-in-out infinite alternate}@keyframes lz{to{opacity:.25}}</style>
 <link rel="stylesheet" href="base.css"></head><body>
 <script>
 const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -17,7 +21,38 @@ levels:[
  {name:'Ловушки',n:5,gen(){return pick([()=>{const v=R(5,20),d=R(2,7);return {q:'У Пети '+(v+d)+' яблок, это на '+d+' больше, чем у Васи. Сколько у Васи?',a:v,hint:'«На '+d+' больше, чем у Васи» — значит у Васи меньше',kind:'Задачи-ловушки'}},()=>{const n=R(3,9);return {q:'Бревно распилили на '+n+' частей. Сколько было распилов?',a:n-1,hint:'Нарисуй: 2 части — 1 распил',kind:'Задачи-ловушки'}},()=>{const s=R(3,8);return {q:'Лестница: между этажами '+s+' ступенек. Сколько ступенек с 1-го до 4-го этажа?',a:3*s,hint:'С 1-го до 4-го — 3 пролёта',kind:'Задачи-ловушки'}}])()}},
  {name:'Уравнения',n:7,gen(){return pick([()=>{const x=R(5,60),b=R(5,40);return {q:'x + '+b+' = '+(x+b),a:x,hint:'Убери '+b+' с обеих сторон',kind:'Уравнения'}},()=>{const x=R(3,25),a=R(2,9);return {q:a+'x = '+a*x,a:x,hint:'Раздели обе части на '+a,kind:'Уравнения'}},()=>{const x=R(2,15),a=R(2,6),b=R(1,20);return {q:a+'x + '+b+' = '+(a*x+b),a:x,hint:'Сначала убери '+b+', потом раздели на '+a,kind:'Уравнения'}},()=>{const x=R(2,12),a=R(2,6),b=R(1,15);return {q:a+'x − '+b+' = '+(a*x-b),a:x,hint:'Прибавь '+b+' к обеим частям',kind:'Уравнения'}}])()}},
  {name:'Сложные уравнения',n:5,gen(){return pick([()=>{const x=R(2,12),c=R(1,4),a=c+R(1,4),b=R(1,20);return {q:a+'x + '+b+' = '+c+'x + '+(b+(a-c)*x),a:x,hint:'Иксы влево, числа вправо',kind:'Уравнения с x с двух сторон'}},()=>{const x=R(4,20),a=R(2,5),b=R(2,15);return {q:'Задумали число, умножили на '+a+' и прибавили '+b+'. Получилось '+(a*x+b)+'. Что за число?',a:x,hint:a+'x + '+b+' = '+(a*x+b),kind:'Задачи на уравнение'}}])()}}],
-onLevel(st){st.innerHTML='<div class="lockmsg" id="lockmsg"></div><div class="safe" id="safe"><div class="dial" id="dial"></div><div class="leds" id="leds"></div></div>';this._r=0;this._n=0},
-onCorrect(st,score,streak){const leds=document.getElementById('leds');const l=document.createElement('i');l.className='on';leds.append(l);if(leds.children>8)leds.firstChild.remove();this._r+=137;document.getElementById('dial').style.transform='rotate('+this._r+'deg)';document.getElementById('lockmsg').textContent=''},
-onLock(st){const s=document.getElementById('safe');s.classList.remove('locked');void s.offsetWidth;s.classList.add('locked');const m=document.getElementById('lockmsg');m.textContent='LOCKED 3s';setTimeout(()=>m.textContent='',3000)}};
+onLevel(st){st.innerHTML=`<svg viewBox="0 0 600 260" aria-hidden="true">
+<defs>
+<linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b968f"/><stop offset=".45" stop-color="#4a544e"/><stop offset="1" stop-color="#1e2421"/></linearGradient>
+<linearGradient id="steel2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f7a73"/><stop offset="1" stop-color="#2a312d"/></linearGradient>
+<radialGradient id="dialG1" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#d9e0db"/><stop offset=".55" stop-color="#7d8781"/><stop offset="1" stop-color="#2c332f"/></radialGradient>
+<radialGradient id="gold" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#fff2a8"/><stop offset=".6" stop-color="#f2b01e"/><stop offset="1" stop-color="#8a5a00"/></radialGradient>
+<radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff3030" stop-opacity=".55"/><stop offset="1" stop-color="#ff3030" stop-opacity="0"/></radialGradient>
+</defs>
+<g stroke="#1b2a20" stroke-width="1" opacity=".5">${Array.from({length:12},(_,i)=>`<line x1="${i*55}" y1="0" x2="${i*55}" y2="260"/>`).join('')}${Array.from({length:6},(_,i)=>`<line x1="0" y1="${i*55}" x2="600" y2="${i*55}"/>`).join('')}</g>
+<g class="laser" stroke="#ff2d2d" stroke-width="2" opacity=".7"><line x1="0" y1="232" x2="600" y2="214"/><line x1="0" y1="246" x2="600" y2="250"/></g>
+<rect x="160" y="18" width="280" height="224" rx="14" fill="#0b0f0c" stroke="#26302a" stroke-width="4"/>
+<g class="gold">${Array.from({length:7},(_,i)=>`<circle cx="${210+i*30}" cy="${210-(i%2)*14}" r="14" fill="url(#gold)" stroke="#6b4500" stroke-width="2"/>`).join('')}<rect x="250" y="150" width="100" height="34" rx="4" fill="url(#gold)" stroke="#6b4500" stroke-width="2"/><text x="300" y="173" text-anchor="middle" font-size="14" font-weight="900" fill="#6b4500" font-family="Inter">GOLD</text></g>
+<g id="door">
+<rect x="178" y="26" width="244" height="208" rx="12" fill="url(#steel)" stroke="#111613" stroke-width="5"/>
+<rect x="196" y="44" width="208" height="172" rx="8" fill="none" stroke="#2b332e" stroke-width="3"/>
+${[[194,44],[404,44],[194,216],[404,216],[194,130],[404,130]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="6" fill="url(#steel2)" stroke="#111" stroke-width="1.5"/>`).join('')}
+<g id="dialG"><circle cx="300" cy="130" r="58" fill="url(#dialG1)" stroke="#121714" stroke-width="5"/>
+${Array.from({length:40},(_,i)=>{const a=i*9*Math.PI/180,r1=i%5?50:45;return `<line x1="${300+Math.sin(a)*r1}" y1="${130-Math.cos(a)*r1}" x2="${300+Math.sin(a)*55}" y2="${130-Math.cos(a)*55}" stroke="#1d2420" stroke-width="${i%5?1.5:3}"/>`}).join('')}
+${Array.from({length:8},(_,i)=>{const a=i*45*Math.PI/180;return `<text x="${300+Math.sin(a)*36}" y="${135-Math.cos(a)*36}" text-anchor="middle" font-size="11" font-weight="900" fill="#1d2420" font-family="Share Tech Mono">${i*10}</text>`}).join('')}
+<circle cx="300" cy="130" r="18" fill="url(#steel2)" stroke="#121714" stroke-width="3"/><rect x="296" y="114" width="8" height="32" rx="3" fill="#2a312d"/></g>
+<path d="M300 66 l-7 -12 h14z" fill="#35f07a"/>
+<g><rect x="378" y="100" width="16" height="60" rx="6" fill="url(#steel2)" stroke="#111" stroke-width="2"/></g>
+</g>
+<g><rect x="452" y="40" width="128" height="56" rx="8" fill="#020503" stroke="#1f3a27" stroke-width="3"/><text x="516" y="58" text-anchor="middle" font-size="10" fill="#4f7a5c" font-family="Share Tech Mono">CODE</text><text id="codeTxt" x="516" y="84" text-anchor="middle" font-size="22" fill="#35f07a">_ _ _ _</text></g>
+<g><rect x="452" y="110" width="128" height="36" rx="8" fill="#020503" stroke="#1f3a27" stroke-width="3"/><text id="statTxt" x="516" y="133" text-anchor="middle" font-size="13" fill="#35f07a" font-family="Share Tech Mono">SYSTEM ARMED</text></g>
+<g id="leds">${Array.from({length:8},(_,i)=>`<circle cx="${30+ (i%2)*28}" cy="${50+Math.floor(i/2)*44}" r="9" fill="#13201a" stroke="#0a110d" stroke-width="2"/>`).join('')}</g>
+<rect id="alarm" width="600" height="260" fill="url(#glow)"/>
+</svg><div class="scan"></div>`;this._r=0;this._k=0;this._code=[]},
+onCorrect(st,score,streak){this._r+=97+Math.floor(Math.random()*120);document.getElementById('dialG').style.transform='rotate('+this._r+'deg)';
+ const leds=document.querySelectorAll('#leds circle');const l=leds[this._k%leds.length];if(l){l.setAttribute('fill','#35f07a');l.style.filter='drop-shadow(0 0 6px #35f07a)'}this._k++;
+ this._code.push(Math.floor(Math.random()*10));const c=this._code.slice(-4);document.getElementById('codeTxt').textContent=(c.join(' ')+' _ _ _ _').slice(0,7);
+ const t=document.getElementById('statTxt');t.textContent=streak>=3?'COMBO x2':'DIGIT OK';t.setAttribute('fill',streak>=3?'#ffd24a':'#35f07a');
+ const need=QUEST.levels.find(x=>true)&&document.querySelectorAll('.prog i').length;if(this._k>=need){st.classList.add('open');t.textContent='ACCESS GRANTED'}},
+onLock(st){st.classList.remove('alarm','shake');void st.offsetWidth;st.classList.add('alarm','shake');const t=document.getElementById('statTxt');t.textContent='LOCKED 3s';t.setAttribute('fill','#ff4d4d');setTimeout(()=>{st.classList.remove('alarm');if(t.textContent==='LOCKED 3s'){t.textContent='SYSTEM ARMED';t.setAttribute('fill','#35f07a')}},3000)}};
 </script><script src="engine.js"></script></body></html>
