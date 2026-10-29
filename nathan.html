@@ -1,0 +1,25 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Робот-строитель</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap">
+<style>:root{--bg:linear-gradient(#e8f4ff,#fff8ec) fixed #fff8ec;--fg:#1d2a3a;--muted:#5a6b80;--panel:#ffffff;--line:#d7e3f0;--accent:#ff7a29;--accent2:#3aa0ff;--on:#fff;--stage:linear-gradient(#bfe6ff,#e9f7ff 70%,#c9e8b0 70%);--screen:#f4f9ff;--key:#ffffff;--keysh:#c9d8e8;--ok:#1fa35a;--bad:#e5484d;--hintbg:#fff2d6;--f:"Nunito",system-ui,sans-serif;--fd:"Baloo 2","Nunito",sans-serif;--fm:"Baloo 2","Nunito",sans-serif;color-scheme:light}
+.grid{display:grid;gap:5px;justify-content:center}.grid span{font-size:26px;line-height:1}
+.rowlab{font:800 14px var(--f);color:var(--muted)}
+.robot{position:absolute;left:12%;bottom:12px;font-size:60px;animation:bob 1.6s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-6px)}}
+.tower{position:absolute;left:38%;bottom:22px;display:flex;flex-direction:column-reverse;gap:2px}
+.tower i{display:block;width:70px;height:16px;border-radius:4px;animation:drop .4s cubic-bezier(.3,1.5,.5,1)}@keyframes drop{from{transform:translateY(-120px);opacity:0}}
+.sun{position:absolute;right:20px;top:14px;font-size:44px}</style>
+<link rel="stylesheet" href="base.css"></head><body>
+<script>
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[Math.floor(Math.random()*a.length)];
+const ICONS=['🍎','⭐','🐞','🍪','🚗','⚽','🧱','🍓'];
+function arr(rows,cols){return v=>{const ic=pick(ICONS);const g=document.createElement('div');g.className='grid';g.style.gridTemplateColumns='repeat('+cols+',auto)';for(let i=0;i<rows*cols;i++){const s=document.createElement('span');s.textContent=ic;g.append(s)}v.append(g);const l=document.createElement('div');l.className='rowlab';l.textContent=rows+' ряд'+(rows===1?'':rows<5?'а':'ов')+' по '+cols;v.append(l)}}
+window.QUEST={title:'Робот-строитель',icon:'🤖',coin:'🧱',intro:'Помоги роботу построить башню! Каждый верный ответ — новый кубик. Посчитай, сколько предметов в рядах.',playLabel:'Строить!',
+particles:['#ff7a29','#3aa0ff','#ffd23f','#1fa35a'],praise:['Бип-буп, верно!','Отлично!','Кубик на месте!','Супер!'],winIcon:'🏰',winTitle:'Башня построена!',
+levels:[
+ {name:'Считаем ряды',n:6,gen(){const r=R(2,4),c=R(2,5);return {q:r+' · '+c+' = ?',a:r*c,hint:'Сложи ряды: '+Array(r).fill(c).join(' + '),visual:arr(r,c),kind:'Смысл умножения'}}},
+ {name:'На 2',n:6,gen(){const b=R(1,10);return {q:'2 · '+b,a:2*b,hint:'Это '+b+' + '+b,visual:b<=6?arr(2,b):null,kind:'Таблица на 2'}}},
+ {name:'На 5 и 10',n:8,gen(){const a=pick([5,10]),b=R(1,10);return {q:a+' · '+b,a:a*b,hint:a===10?'Припиши ноль: '+b+'0':'Считай пятёрками: 5, 10, 15…',kind:'Таблица на 5 и 10'}}},
+ {name:'На 3',n:6,gen(){const b=R(1,10);return {q:'3 · '+b,a:3*b,hint:'Считай тройками: 3, 6, 9…',visual:b<=5?arr(3,b):null,kind:'Таблица на 3'}}},
+ {name:'Задачи',n:5,gen(){return pick([()=>{const n=R(2,6);return {q:'У '+n+' котиков по 2 уха. Сколько ушей?',a:2*n,hint:n+' раз по 2',kind:'Задачи'}},()=>{const n=R(2,6);return {q:n+' пачек, в каждой 5 карандашей. Сколько карандашей?',a:5*n,hint:n+' раз по 5',kind:'Задачи'}},()=>{const n=R(2,5);return {q:'У '+n+' машинок по 4 колеса. Сколько колёс?',a:4*n,hint:'4 + 4 + … ('+n+' раз)',visual:arr(n,4),kind:'Задачи'}}])()}}],
+onLevel(st){st.innerHTML='<div class="sun">☀️</div><div class="robot">🤖</div><div class="tower" id="tower"></div>'},
+onCorrect(){const t=document.getElementById('tower');const c=['#ff7a29','#3aa0ff','#ffd23f','#1fa35a','#b06cff'];const i=document.createElement('i');i.style.background=c[t.children.length%c.length];t.append(i)}};
+</script><script src="engine.js"></script></body></html>
