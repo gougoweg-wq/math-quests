@@ -126,7 +126,7 @@ window.S3D={reset(){state='idle';openT=0;safe.position.set(0,0,0);safe.rotation.
 let last=performance.now();
 function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;const time=(t-t0)/1000;
  dial.rotation.z+=(targetRot-dial.rotation.z)*Math.min(1,dt*6);
- const orbit=state==='open'?time*.4:Math.sin(time*.35)*.35;cam.position.set(Math.sin(orbit)*4.2+.3,1.25+Math.sin(time*.5)*.05,Math.cos(orbit)*4.4);
+ const orbit=state==='open'?Math.sin(time*.8)*.55:Math.sin(time*.35)*.35;cam.position.set(Math.sin(orbit)*4.2+.3,1.25+Math.sin(time*.5)*.05,Math.cos(orbit)*4.4);
  if(shake>0){shake=Math.max(0,shake-dt*2);cam.position.x+=(Math.random()-.5)*.12*shake;cam.position.y+=(Math.random()-.5)*.08*shake}
  cam.lookAt(0,.75,0);
  if(alarmT>0){alarmT-=dt;red.intensity=(Math.sin(time*25)>0?1:0)*30;spot.color.set(0xff6060)}else{red.intensity=0;spot.color.set(0xffffff)}
