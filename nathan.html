@@ -45,7 +45,7 @@ new GLTFLoader().load('models/robot.glb',g=>{robot=g.scene;robot.traverse(o=>{if
  mixer.addEventListener('finished',()=>{if(state!=='dance')play('Idle')})});
 function resize(){const w=st.clientWidth,h=st.clientHeight;r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}new ResizeObserver(resize).observe(st);resize();
 let state='idle',t0=performance.now();
-window.R3D={reset(){blocks.forEach(b=>sc.remove(b));blocks.length=0;cnt.textContent='🧱 0';state='idle';play('Idle')},
+window.R3D={_b:blocks,reset(){blocks.forEach(b=>sc.remove(b));blocks.length=0;cnt.textContent='🧱 0';state='idle';play('Idle')},
  block(){const i=blocks.length;const m=new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:COLORS[i%COLORS.length],roughness:.45}));m.castShadow=true;m.receiveShadow=true;m.position.set(1.4+(Math.random()-.5)*.08,7,0);m.rotation.y=(Math.random()-.5)*.3;m.userData={vy:0,target:.12+.18+i*.36};sc.add(m);blocks.push(m);cnt.textContent='🧱 '+blocks.length;
   play(Math.random()<.5?'ThumbsUp':'Yes',true);if(blocks.length>=(document.querySelectorAll('.prog i').length||6)){state='dance';setTimeout(()=>play('Dance'),700)}},
  no(){play('No',true)}};
