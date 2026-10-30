@@ -1,0 +1,115 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Колода X</title>
+<style>
+:root{--bg:#17121f;--panel:#241b31;--panel2:#31253f;--line:#493a5e;--fg:#f6efff;--muted:#b3a6c9;--gold:#ffc857;--red:#ff6b6b;--green:#5fe0a0;--blue:#6fb7ff}
+*{box-sizing:border-box}[hidden]{display:none!important}html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:820px;margin:0 auto;padding:10px 14px 24px;display:flex;flex-direction:column;gap:10px}
+.top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.top .sp{flex:1}
+.pill{background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:4px 11px;font-weight:800;white-space:nowrap}
+.ib{background:var(--panel);color:var(--fg);border:2px solid var(--line);border-radius:10px;min-width:40px;min-height:38px;cursor:pointer}
+.foe{display:flex;align-items:center;gap:12px;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:10px 12px}
+.foe .face{font-size:46px;line-height:1;transition:transform .15s}.foe.hit .face{transform:scale(.8) rotate(-10deg)}.foe.strike .face{transform:scale(1.35)}
+.foe h2{margin:0;font-size:17px}.foe .sub{color:var(--muted);font-size:13px;font-weight:600}.intent{margin-left:auto;font-weight:900;color:var(--red);white-space:nowrap}
+.story{background:var(--panel2);border-radius:14px;padding:12px;font-size:18px;font-weight:600}.story small{display:block;color:var(--gold);font-size:14px;font-weight:800;margin-top:6px}
+.shields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:7px}
+.sh{font:inherit;font-weight:800;text-align:left;background:#3a2233;color:var(--fg);border:2px dashed var(--red);border-radius:12px;padding:9px 11px;min-height:46px;cursor:pointer}
+.sh.done{background:#1d3a30;border:2px solid var(--green);color:var(--green);cursor:default}.sh.tip{outline:3px solid var(--gold)}.sh.fr{background:#24304a;border-color:var(--blue)}
+.rail{font:800 20px/1.35 ui-monospace,Menlo,Consolas,monospace;background:#0f0b16;border:2px solid var(--line);border-radius:12px;padding:10px;text-align:center;color:var(--gold);overflow-wrap:anywhere}
+.hand{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+.c{font:800 18px ui-monospace,Menlo,Consolas,monospace;min-width:88px;min-height:70px;padding:6px 10px;background:#f4ecd8;color:#2a1f12;border:3px solid #bfa878;border-radius:12px;cursor:pointer;transition:transform .12s;box-shadow:0 4px 0 #0007}
+.c.sel{transform:translateY(-9px);border-color:var(--gold);box-shadow:0 10px 0 #0005}.c.fr{background:#d6e6ff;border-color:#7ea6dd}.c.sk{background:#3f2d57;color:var(--fg);border-color:#8d6fc0;font:800 14px system-ui,sans-serif}.c.sk small{display:block;font-weight:600;font-size:11px;color:var(--muted);max-width:110px}.c.tip{outline:3px solid var(--gold)}.c:disabled{opacity:.45}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px}.msg{font-weight:800;min-height:22px;flex:1}.msg.bad{color:var(--red)}.msg.ok{color:var(--green)}
+.btn{font:900 16px system-ui,sans-serif;border:0;border-radius:12px;min-height:46px;padding:0 18px;background:var(--gold);color:#2a1f12;cursor:pointer}.btn.sec{background:var(--panel2);color:var(--fg);border:2px solid var(--line)}
+.scale{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px;align-items:center}
+.scale svg{width:100%;max-width:420px;height:auto}.beam{transition:transform .25s}
+.sl{width:100%;max-width:420px;display:flex;gap:8px;align-items:center}.sl input{flex:1;accent-color:var(--gold);height:30px}.xv{font:900 24px ui-monospace,Menlo,Consolas,monospace;color:var(--gold)}
+.overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:14px;background:rgba(8,5,14,.82);overflow:auto}
+.modal{width:min(520px,100%);background:var(--panel);border:2px solid var(--line);border-radius:20px;padding:20px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.modal h2{margin:0;font-size:24px}.modal p{margin:0;color:var(--muted);font-weight:600}.big{font-size:54px;line-height:1}
+.pick{display:grid;gap:8px;width:100%}.pk{font:inherit;text-align:left;background:var(--panel2);color:var(--fg);border:2px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}.pk b{display:block;color:var(--gold)}
+details{background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:8px 12px}summary{cursor:pointer;font-weight:800;color:var(--muted)}table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}th,td{text-align:left;padding:5px 4px;border-top:1px solid var(--line)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><div class="wrap" id="app"></div>
+<script>
+/*CORE*/
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[R(0,a.length-1)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=R(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+const NAMES=['Ноа','Ари','Дани','Рони','Тали','Лиа'];
+const two=()=>{const a=pick(NAMES);let b=pick(NAMES);while(b===a)b=pick(NAMES);return[a,b]};
+const raz=k=>k<=4?'раза':'раз';
+const pl=(n,a,b,c)=>{const m=n%100,d=n%10;return n+' '+(m>10&&m<20?c:d===1?a:d>=2&&d<=4?b:c)};
+const dec=n=>String(n).replace('.',',');
+const CASES={
+sum3(){const n=R(11,40),S=3*n+3;return{kind:'Числа подряд',text:`Три числа идут подряд, их сумма равна ${S}.`,letX:'первое число',root:n,frame:'▢ + ▢ + ▢ = ▢',phr:[['первое число','x'],['следующее за ним','x + 1'],['третье число','x + 2'],['их сумма',''+S]],traps:['2x','x + 3','3x','x − 1']}},
+more(){const[A,B]=two(),a=R(12,40),d=R(3,15),S=2*a+d;return{kind:'На больше',text:`У ${A} и ${B} вместе ${pl(S,'монета','монеты','монет')}. У ${B} на ${pl(d,'монету','монеты','монет')} больше, чем у ${A}.`,letX:`монеты ${A}`,root:a,frame:'▢ + ▢ = ▢',phr:[[`монеты ${A}`,'x'],[`у ${B} на ${d} больше`,`x + ${d}`],['вместе',''+S]],traps:[`${d}x`,`x − ${d}`,`${S} + x`,`${d}`]}},
+times(){const[A,B]=two(),a=R(6,20),k=R(3,6),S=a*(k+1);return{kind:'Во сколько раз',text:`У ${A} и ${B} вместе ${pl(S,'наклейка','наклейки','наклеек')}. У ${A} в ${k} ${raz(k)} больше, чем у ${B}.`,letX:`наклейки ${B}`,root:a,frame:'▢ + ▢ = ▢',phr:[[`наклейки ${B}`,'x'],[`у ${A} в ${k} ${raz(k)} больше`,`${k}x`],['вместе',''+S]],traps:[`x + ${k}`,`x/${k}`,`${S}x`,`${k}`]}},
+rect(){const w=R(4,20),d=R(2,9),P=2*(2*w+d);return{kind:'Периметр',text:`Длина прямоугольника на ${d} см больше ширины. Периметр равен ${P} см.`,letX:'ширина',root:w,frame:'2(▢ + ▢) = ▢',phr:[['ширина','x'],[`длина на ${d} больше`,`x + ${d}`],['периметр',''+P]],traps:[`${d}x`,`x − ${d}`,`2x`,`${P}x`]}},
+price(){const p=pick([10,20,25,50]),o=20*R(5,30),P=o*(100+p)/100,q=dec(p/100);return{kind:'Проценты: рост',text:`Кроссовки подорожали на ${p}% и теперь стоят ${P} ₪.`,letX:'старая цена',root:o,frame:'▢ + ▢ = ▢',phr:[['старая цена','x'],[`прибавка ${p}%`,`${q}x`],['новая цена',''+P]],traps:[`${p}x`,`x + ${p}`,`x/${p}`,`${q}`]}},
+sale(){const p=pick([10,20,25,50]),o=20*R(5,30),P=o*(100-p)/100,q=dec(p/100);return{kind:'Проценты: скидка',text:`На куртку скидка ${p}%. Со скидкой она стоит ${P} ₪.`,letX:'цена без скидки',root:o,frame:'▢ − ▢ = ▢',phr:[['цена без скидки','x'],[`скидка ${p}%`,`${q}x`],['цена со скидкой',''+P]],traps:[`${p}x`,`x − ${p}`,`x/${p}`,`${q}`]}},
+give(){const[A,B]=two(),g=R(6,25);return{kind:'Было и стало',text:`У ${A} в 3 раза больше карточек, чем у ${B}. Если ${A} передаст ${B} ${pl(g,'карточку','карточки','карточек')}, у них станет поровну.`,letX:`карточки ${B} сейчас`,root:g,frame:'▢ = ▢',phr:[[`у ${A} станет`,`3x − ${g}`],[`у ${B} станет`,`x + ${g}`]],traps:[`3x + ${g}`,`x − ${g}`,`3(x − ${g})`,`${g}x`]}},
+speed(){const a=R(2,3),b=R(2,4),v=R(30,70),d=10*R(1,2),S=a*v+b*(v+d);return{kind:'Движение',text:`Поезд ехал ${a} ч с одной скоростью, потом ${b} ч на ${d} км/ч быстрее. Всего он проехал ${S} км.`,letX:'скорость сначала',root:v,frame:'▢ + ▢ = ▢',phr:[['путь сначала',`${a}x`],['путь потом',`${b}(x + ${d})`],['весь путь',''+S]],traps:[`${b}x + ${d}`,`x + ${a}`,`${a}(x + ${d})`,`${b}(x − ${d})`]}},
+age(){const b=R(7,12),t=R(3,8),a=3*b+2*t;return{kind:'Возраст',text:`Папе ${pl(a,'год','года','лет')}, сыну ${b}. Через сколько лет папа будет старше сына ровно в 3 раза?`,letX:'сколько лет пройдёт',root:t,frame:'▢ = 3(▢)',phr:[['папа через x лет',`${a} + x`],['сын через x лет',`${b} + x`]],traps:[`${a}x`,`${b}x`,`${a} − x`,`${b} − x`]}},
+book(){const m=R(2,12),N=7*m;return{kind:'Дроби',text:`В первый день прочитали треть книги, во второй — четверть. Всего прочитано ${pl(N,'страница','страницы','страниц')}.`,letX:'страницы всей книги',root:12*m,frame:'▢ + ▢ = ▢',phr:[['треть книги','x/3'],['четверть книги','x/4'],['прочитано',''+N]],traps:['3x','4x','x − 3','x + 4']}},
+money(){const m=R(12,30),s=R(5,15),r=2*m-s;return{kind:'Было и осталось',text:`Тали потратила треть денег на книгу и ещё ${s} ₪ на сок. Осталось ${r} ₪.`,letX:'деньги сначала',root:3*m,frame:'▢ − ▢ − ▢ = ▢',phr:[['деньги сначала','x'],['на книгу','x/3'],['на сок',''+s],['осталось',''+r]],traps:['3x',`${s}x`,`x + ${s}`,'x − 3']}},
+tickets(){const a=R(2,5),b=R(2,4),d=5*R(1,3),p=5*R(6,14),T=a*p+b*(p-d);return{kind:'Покупка',text:`Купили ${a} взрослых и ${b} детских билетов на ${T} ₪. Детский на ${d} ₪ дешевле взрослого.`,letX:'цена взрослого билета',root:p,frame:'▢ + ▢ = ▢',phr:[['взрослые билеты',`${a}x`],['детские билеты',`${b}(x − ${d})`],['вся покупка',''+T]],traps:[`${b}x − ${d}`,`${b}(x + ${d})`,`${a}(x − ${d})`,`${b}x`]}}
+};
+const FRAMES={2:['▢ = ▢','▢ + ▢ = 0','▢ = 2(▢)','▢ = 3(▢)','3(▢) = ▢'],3:['▢ + ▢ = ▢','▢ − ▢ = ▢','▢ = ▢ + ▢','▢ · ▢ = ▢','2(▢ + ▢) = ▢'],4:['▢ + ▢ + ▢ = ▢','▢ − ▢ − ▢ = ▢','▢ + ▢ − ▢ = ▢','▢ − ▢ + ▢ = ▢']};
+const slots=f=>(f.match(/▢/g)||[]).length;
+const fill=(f,ts)=>{let i=0;return f.replace(/▢/g,()=>{const t=ts[i++];return t==null?'▢':t})};
+function compile(s){s=s.replace(/−/g,'-').replace(/·/g,'*').replace(/,/g,'.').replace(/\s/g,'');let i=0;
+ const expr=()=>{let f=term();while(s[i]==='+'||s[i]==='-'){const o=s[i++],a=f,b=term();f=o==='+'?x=>a(x)+b(x):x=>a(x)-b(x)}return f};
+ const term=()=>{let f=fac();for(;;){const c=s[i];if(c==='*'||c==='/'){i++;const a=f,b=fac();f=c==='*'?x=>a(x)*b(x):x=>a(x)/b(x)}else if(c==='x'||c==='('){const a=f,b=fac();f=x=>a(x)*b(x)}else return f}};
+ const fac=()=>{if(s[i]==='x'){i++;return x=>x}if(s[i]==='('){i++;const f=expr();i++;return f}const m=s.slice(i).match(/^\d+(\.\d+)?/);i+=m[0].length;const v=+m[0];return()=>v};
+ return expr()}
+const sides=eq=>eq.split('=').map(compile);
+const rootOf=eq=>{const[L,Rr]=sides(eq),d=x=>L(x)-Rr(x),y0=d(1),y1=d(2),y2=d(3);if(Math.abs(y2-2*y1+y0)>1e-9)return NaN;const a=y1-y0;return Math.abs(a)<1e-9?NaN:-(y0-a)/a};
+/*END*/
+const $=id=>document.getElementById(id),el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const FOES=[['🟢','Слизь Плюс',2,['sum3','more','times']],['🦇','Минусовая мышь',2,['more','times','rect']],['🧟','Процентный зомби',3,['price','sale','rect']],['🕷️','Паук Равенства',3,['give','sale','price']],['🐉','Дробный дракон',4,['book','money','speed','tickets']],['👑','Король Икс',5,['age','speed','tickets','money']]];
+const SK={scan:{n:'Скан',d:'сжигает ловушки в руке',c:1},guard:{n:'Щит',d:'блок +4',c:1},bolt:{n:'Заряд',d:'+2 энергии',c:0},tip:{n:'Подсказка',d:'показывает верный ход',c:1}};
+const LOOT=[{k:'scan',n:'Карта «Скан»',d:'Сжигает все ловушки в руке.'},{k:'bolt',n:'Карта «Заряд»',d:'+2 энергии, бесплатно.'},{k:'tip',n:'Карта «Подсказка»',d:'Показывает верную пару.'},{k:'guard',n:'Карта «Щит»',d:'Блок +4.'},{r:'armor',n:'Реликвия: Броня',d:'Каждый ход +2 блока.'},{r:'batt',n:'Реликвия: Батарея',d:'Каждый ход +1 энергия.'},{r:'lens',n:'Реликвия: Линза',d:'В начале боя сгорает одна ловушка.'},{h:6,n:'Зелье',d:'Вернуть 6 здоровья.'}];
+let muted=true,ac=null,hp,maxHp=16,deck,relics,floor,log=[],F=null;
+function tone(f,d,t=0){if(muted)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume();const o=ac.createOscillator(),g=ac.createGain(),s=ac.currentTime+t;o.frequency.value=f;g.gain.setValueAtTime(.1,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.connect(g).connect(ac.destination);o.start(s);o.stop(s+d)}catch(e){}}
+function newRun(){hp=maxHp;deck=['scan','guard','guard'];relics=[];floor=0;log=[];startFight()}
+function startFight(){const[face,name,atk,pool]=FOES[floor];const c=CASES[pick(pool)]();const ts=c.phr.map(p=>p[1]);const fr=shuffle(FRAMES[slots(c.frame)].filter(f=>f!==c.frame&&!(Math.abs(rootOf(fill(f,ts))-c.root)<1e-6))).slice(0,2);
+ const tiles=[...c.phr.map((p,i)=>({t:p[1],slot:i})),...c.traps.filter(t=>!c.phr.some(p=>p[1]===t)).map(t=>({t,trap:true})),{t:c.frame,frame:true},...fr.map(t=>({t,frame:true,trap:true}))];
+ tiles.forEach((t,i)=>t.id=i);F={face,name,atk,c,pool:tiles,hand:[],skills:[],sel:null,placed:c.phr.map(()=>null),frame:null,en:0,block:0,msg:'',mc:'',tip:null,wrong:[],hits:0,done:false};
+ if(relics.includes('lens')){const a=F.pool.filter(t=>t.trap&&!t.frame);if(a.length)F.pool=F.pool.filter(t=>t!==pick(a))}
+ turn()}
+function left(){return F.pool.filter(t=>!t.trap&&!t.used)}
+function turn(){F.en=3+(relics.includes('batt')?1:0);F.block=relics.includes('armor')?2:0;F.sel=null;F.tip=null;const free=F.pool.filter(t=>!t.used);const good=shuffle(free.filter(t=>!t.trap)),bad=shuffle(free.filter(t=>t.trap));const g=good.slice(0,3);F.hand=shuffle([...g,...bad.slice(0,5-g.length)]);F.skills=shuffle(deck).slice(0,2).map(k=>({k}));render()}
+function say(m,c){F.msg=m;F.mc=c}
+function hitMe(n,why){const a=Math.min(F.block,n);F.block-=a;const d=n-a;hp-=d;F.hits+=d;tone(160,.25);return d}
+function play(card,sh){if(F.en<1)return;F.en--;const ok=sh==='frame'?(card.frame&&!card.trap):(!card.frame&&!card.trap&&card.t===F.c.phr[sh][1]);
+ if(ok){card.used=true;F.hand=F.hand.filter(x=>x!==card);if(sh==='frame')F.frame=card.t;else F.placed[sh]=card.t;F.sel=null;F.tip=null;say('Попал! Щит пробит.','ok');tone(660,.1);tone(880,.12,.08);bump('hit')}
+ else{const lab=sh==='frame'?'как всё связать':F.c.phr[sh][0];F.wrong.push(lab+' ≠ '+card.t);F.hand=F.hand.filter(x=>x!==card);if(card.trap)card.used=true;F.sel=null;const d=hitMe(1);say(`Не то: «${lab}» — это не ${card.t}. Контрудар −${d}.`,'bad');bump('strike')}
+ if(hp<=0)return lose();if(F.frame&&F.placed.every(Boolean))return finisher();render();if(F.en<1&&!F.skills.some(s=>SK[s.k].c===0))F.timer=setTimeout(endTurn,1400)}
+function bump(c){const e=document.querySelector('.foe');if(!e)return;e.classList.add(c);setTimeout(()=>e.classList.remove(c),200)}
+function endTurn(){clearTimeout(F.timer);if(!F||F.done||document.querySelector('.scale'))return;const d=hitMe(F.atk);say(d?`${F.name} бьёт: −${d}.`:'Блок выдержал удар!',d?'bad':'ok');if(hp<=0)return lose();turn();bump('strike')}
+function useSkill(s){const S=SK[s.k];if(F.en<S.c)return;F.en-=S.c;F.skills=F.skills.filter(x=>x!==s);
+ if(s.k==='guard'){F.block+=4;say('Блок +4.','ok')}
+ if(s.k==='bolt'){F.en+=2;say('Энергия +2.','ok')}
+ if(s.k==='scan'){const t=F.hand.filter(c=>c.trap);t.forEach(c=>c.used=true);F.hand=F.hand.filter(c=>!c.trap);say(`Сгорело ловушек: ${t.length}.`,'ok')}
+ if(s.k==='tip'){const c=F.hand.find(c=>!c.trap);if(c){F.tip={id:c.id,sh:c.frame?'frame':F.c.phr.findIndex((p,i)=>p[1]===c.t&&!F.placed[i])};say('Подсвечена верная пара.','ok')}}
+ tone(520,.1);render()}
+function header(a){const t=el('div','top');t.append(el('div','pill','❤️ '+Math.max(0,hp)+'/'+maxHp),el('div','pill','⚡ '+F.en),el('div','pill','🛡️ '+F.block),el('div','pill','Этаж '+(floor+1)+'/'+FOES.length));if(relics.length)t.append(el('div','pill',relics.map(r=>({armor:'🦺',batt:'🔋',lens:'🔎'}[r])).join('')));t.append(el('div','sp'));const m=el('button','ib',muted?'🔇':'🔊');m.type='button';m.setAttribute('aria-label',muted?'Включить звук':'Выключить звук');m.onclick=()=>{muted=!muted;render()};t.append(m);a.append(t);
+ const left=F.c.phr.filter((_,i)=>!F.placed[i]).length+(F.frame?0:1);const f=el('div','foe');f.append(el('div','face',F.face));const w=el('div');w.append(el('h2',null,F.name),el('div','sub',left?'Щитов осталось: '+left:'Щиты пробиты!'));f.append(w,el('div','intent','⚔️ '+F.atk));a.append(f)}
+function railText(){return fill(F.frame||F.c.frame.replace(/[^▢=]+/g,' ').replace(/\s+/g,' ').trim(),F.frame?F.placed.map(p=>p||undefined):F.placed.map(p=>p||undefined))}
+function render(){const a=$('app');a.replaceChildren();header(a);const s=el('div','story',F.c.text);s.append(el('small',null,'x — '+F.c.letX));a.append(s);
+ const sh=el('div','shields');F.c.phr.forEach((p,i)=>{const b=el('button','sh'+(F.placed[i]?' done':'')+(F.tip&&F.tip.sh===i?' tip':''),F.placed[i]?p[0]+' = '+F.placed[i]:p[0]);b.type='button';b.dataset.sh=i;if(!F.placed[i])b.onclick=()=>{if(F.sel!=null){const c=F.hand.find(x=>x.id===F.sel);c&&play(c,i)}else{say('Сначала выбери карту.','')
+ ;render()}};sh.append(b)});const fb=el('button','sh fr'+(F.frame?' done':'')+(F.tip&&F.tip.sh==='frame'?' tip':''),F.frame?'связь: '+F.frame:'как всё связать');fb.type='button';fb.dataset.sh='frame';if(!F.frame)fb.onclick=()=>{if(F.sel!=null){const c=F.hand.find(x=>x.id===F.sel);c&&play(c,'frame')}else{say('Сначала выбери карту.','');render()}};sh.append(fb);a.append(sh,el('div','rail',railText()));
+ const h=el('div','hand');F.hand.forEach(c=>{const b=el('button','c'+(c.frame?' fr':'')+(F.sel===c.id?' sel':'')+(F.tip&&F.tip.id===c.id?' tip':''),c.t);b.type='button';b.dataset.card=c.id;b.disabled=F.en<1;b.onclick=()=>{F.sel=F.sel===c.id?null:c.id;render()};h.append(b)});F.skills.forEach(s=>{const S=SK[s.k],b=el('button','c sk',S.n+' ('+S.c+'⚡)');b.append(el('small',null,S.d));b.type='button';b.dataset.skill=s.k;b.disabled=F.en<S.c;b.onclick=()=>useSkill(s);h.append(b)});a.append(h);
+ const bar=el('div','bar');bar.append(el('div','msg '+F.mc,F.msg));const e=el('button','btn sec','Закончить ход');e.type='button';e.id='end';e.onclick=endTurn;bar.append(e);a.append(bar);foot(a)}
+function foot(a){const d=el('details');d.append(el('summary',null,'Для учителя'));const t=el('table');t.innerHTML='<tr><th>Тип</th><th>Уравнение</th><th>Ошибки перевода</th></tr>';log.forEach(l=>{const r=el('tr');[l.kind,l.eq,l.wrong.join('; ')||'нет'].forEach(x=>r.append(el('td',null,x)));t.append(r)});d.append(t);a.append(d)}
+function finisher(){F.done=true;const eq=fill(F.frame,F.placed);const[L,Rr]=sides(eq);const a=$('app');a.replaceChildren();header(a);const r=F.c.root,st=r>=100&&r%20===0?20:1,lo=Math.max(1,r-st*R(5,14)),hi=r+st*R(5,14),start=Math.random()<.5?lo:hi;
+ const b=el('div','scale');b.append(el('div','rail',eq));b.insertAdjacentHTML('beforeend','<svg viewBox="0 0 320 130" role="img" aria-label="Весы"><rect x="154" y="40" width="12" height="82" fill="#6d5a86"/><rect x="110" y="118" width="100" height="10" rx="5" fill="#6d5a86"/><g class="beam" id="beam" style="transform-origin:160px 40px"><rect x="30" y="36" width="260" height="8" rx="4" fill="#ffc857"/><rect x="10" y="44" width="80" height="34" rx="8" fill="#31253f" stroke="#ffc857"/><rect x="230" y="44" width="80" height="34" rx="8" fill="#31253f" stroke="#ffc857"/><text id="lv" x="50" y="67" fill="#fff" font-size="16" font-weight="800" text-anchor="middle"></text><text id="rv" x="270" y="67" fill="#fff" font-size="16" font-weight="800" text-anchor="middle"></text></g></svg>');
+ const sl=el('div','sl'),minus=el('button','ib','−'),plus=el('button','ib','+'),inp=el('input');inp.type='range';inp.min=lo;inp.max=hi;inp.step=st;inp.value=start;inp.setAttribute('aria-label','Значение x');const xv=el('div','xv');minus.type=plus.type='button';sl.append(minus,inp,plus,xv);const go=el('button','btn','💥 Добить');go.type='button';go.disabled=true;go.id='finish';const hint=el('div','msg','Двигай x, пока чаши не сравняются.');b.append(sl,hint,go);a.append(b);
+ const fm=v=>dec(+v.toFixed(2));const up=()=>{const x=+inp.value,l=L(x),rr=Rr(x),d=l-rr;$('lv').textContent=fm(l);$('rv').textContent=fm(rr);xv.textContent='x='+x;$('beam').style.transform=`rotate(${Math.max(-14,Math.min(14,-d/(Math.abs(rr)+1)*40))}deg)`;const ok=Math.abs(d)<1e-6;go.disabled=!ok;hint.textContent=ok?'Равновесие! Бей.':'Двигай x, пока чаши не сравняются.';hint.className='msg'+(ok?' ok':'')};
+ inp.oninput=up;minus.onclick=()=>{inp.value=+inp.value-st;up()};plus.onclick=()=>{inp.value=+inp.value+st;up()};go.onclick=()=>win(eq);up();foot(a)}
+function win(eq){log.push({kind:F.c.kind,eq,wrong:F.wrong});tone(523,.12);tone(784,.2,.1);tone(1047,.3,.2);floor++;if(floor>=FOES.length)return end(true);const ov=el('div','overlay'),m=el('div','modal');m.append(el('div','big','⚔️'),el('h2',null,F.name+' повержен'),el('p',null,F.wrong.length?'Ошибок перевода: '+F.wrong.length:'Ни одной ошибки перевода!'),el('p',null,'Выбери награду:'));const p=el('div','pick');shuffle(LOOT).slice(0,3).forEach(l=>{const b=el('button','pk');b.type='button';b.append(el('b',null,l.n),el('span',null,l.d));b.onclick=()=>{if(l.k)deck.push(l.k);if(l.r&&!relics.includes(l.r))relics.push(l.r);if(l.h)hp=Math.min(maxHp,hp+l.h);ov.remove();startFight()};p.append(b)});m.append(p);ov.append(m);document.body.append(ov)}
+function lose(){F.done=true;log.push({kind:F.c.kind,eq:'не собрано',wrong:F.wrong});end(false)}
+function end(won){const ov=el('div','overlay'),m=el('div','modal'),errs=log.reduce((s,l)=>s+l.wrong.length,0);m.append(el('div','big',won?'👑':'💀'),el('h2',null,won?'Король Икс повержен!':'Забег окончен'),el('p',null,won?`Здоровья осталось: ${hp}. Ошибок перевода: ${errs}.`:`Дошёл до этажа ${floor+1} из ${FOES.length}. Ошибок перевода: ${errs}.`));if(errs){const w=log.flatMap(l=>l.wrong).slice(-3).join('; ');m.append(el('p',null,'Разбери: '+w))}const b=el('button','btn','Новый забег');b.type='button';b.onclick=()=>{ov.remove();newRun()};m.append(b);ov.append(m);document.body.append(ov);b.focus()}
+(function(){const ov=el('div','overlay'),m=el('div','modal');m.append(el('div','big','🃏'),el('h2',null,'Колода X'),el('p',null,'Каждая фраза задачи — щит монстра. Выбери карту и ударь по нужной фразе: «на 5 больше» пробивается картой x + 5. Среди карт есть ловушки, и за них монстр бьёт в ответ.'),el('p',null,'Когда все щиты пробиты, из карт сложится уравнение. Уравновесь весы и добей.'));const b=el('button','btn','Начать забег');b.type='button';b.onclick=()=>{ov.remove();newRun()};m.append(b);ov.append(m);document.body.append(ov)})();
+</script></body></html>
