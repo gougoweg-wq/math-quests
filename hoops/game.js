@@ -88,7 +88,7 @@ for(let r=0;r<7;r++){sideRow(-1,r);sideRow(1,r);if(r<6)endRow(r)}
 const pers=new THREE.InstancedMesh(new THREE.CapsuleGeometry(.21,.42,4,10),new THREE.MeshStandardMaterial({roughness:.75}),crowd.length);
 const heads=new THREE.InstancedMesh(new THREE.SphereGeometry(.16,14,12),new THREE.MeshStandardMaterial({roughness:.6}),crowd.length);
 const M=new THREE.Matrix4(),C=new THREE.Color();const skin=[0xf0c8a0,0xc48e62,0x8c5a38,0x5e3c28];
-crowd.forEach((p,i)=>{if(Math.random()<.14)p[1]=-9;M.makeTranslation(...p);pers.setMatrixAt(i,M);M.makeTranslation(p[0],p[1]+.46,p[2]);heads.setMatrixAt(i,M);pers.setColorAt(i,C.setHex(kits[i*7%kits.length]));heads.setColorAt(i,C.setHex(skin[i*3%4]));p[3]=Math.random()*6.28});
+crowd.forEach((p,i)=>{if(Math.random()<.14)p[1]=-9;M.makeTranslation(...p);pers.setMatrixAt(i,M);M.makeTranslation(p[0],p[1]+.46,p[2]);heads.setMatrixAt(i,M);pers.setColorAt(i,C.setHex(kits[Math.floor(Math.random()*kits.length)]));heads.setColorAt(i,C.setHex(skin[Math.floor(Math.random()*4)]));p[3]=Math.random()*6.28});
 pers.frustumCulled=heads.frustumCulled=false;scene.add(pers,heads);
 // boards around the court
 const ad=canvasTex(1024,128,g=>{g.fillStyle='#0d1730';g.fillRect(0,0,1024,128);g.font='400 76px Anton,Impact,sans-serif';g.textBaseline='middle';for(let i=0;i<4;i++){g.fillStyle=i%2?'#ffcf33':'#ff7a1a';g.fillText(i%2?'3 × 6 = 18':'HOOP MATHS',20+i*256,68)}});
@@ -124,7 +124,7 @@ $('mute').onclick=e=>{muted=!muted;e.currentTarget.textContent=muted?'Sound off'
 const round=()=>ROUNDS[R],toast=(t,c)=>{const e=$('toast');e.textContent=t;e.style.color=c||'#fff';e.style.opacity=1;clearTimeout(e._t);e._t=setTimeout(()=>e.style.opacity=0,820)};
 function setSpots(){const r=round(),box=$('spots');box.replaceChildren();PTS.forEach(p=>{const b=document.createElement('button');b.type='button';b.className='sp'+(p===spot?' on':'');b.innerHTML=`${p}<small>POINTS</small>`;b.disabled=r.spot!=null&&r.spot!==p;b.onclick=()=>{if(phase==='plan'){spot=p;render()}};box.append(b)})}
 function render(){const r=round();$('tgt').textContent=r.target;$('sc').textContent=score;$('bl').textContent=phase==='plan'?balls:left;
- $('quarter').innerHTML=`QUARTER ${r.q}<span>${'★'.repeat(stars)}</span>`;
+ $('mission').hidden=phase!=='plan';$('quarter').innerHTML=`QUARTER ${r.q}<span>${'★'.repeat(stars)}</span>`;
  $('mission').textContent=phase==='plan'?(r.spot?`Each shot is ${r.spot} points. How many balls for exactly ${r.target}?`:r.balls?`You have ${r.balls} balls. Which spot gives exactly ${r.target}?`:`Score exactly ${r.target}. You choose the spot and the balls.`):`${spot} points each · shoot all ${balls}`;
  setSpots();const b=$('balls');b.replaceChildren(...Array.from({length:balls},()=>Object.assign(document.createElement('i'),{className:'bl'})));$('n').textContent=balls;
  $('minus').disabled=r.balls!=null||balls<=1;$('plus').disabled=r.balls!=null||balls>=MAXB;
@@ -136,7 +136,7 @@ function play(){if(phase!=='plan')return;phase='aim';left=balls;score=0;$('plan'
 let bandLo=.5,bandHi=.7;
 function setBand(){const w=BAND[spot],c=.62;bandLo=c-w/2;bandHi=c+w/2;const b=$('band');b.style.bottom=bandLo*100+'%';b.style.height=w*100+'%'}
 const shotDir=new THREE.Vector3();
-function placeBall(){const s=SPOTS[spot];shotDir.set(s[0],0,s[1]).normalize();ball.position.set(s[0]+shotDir.x*.95+shotDir.z*.24,1.56,s[1]+shotDir.z*.95-shotDir.x*.24);ball.visible=true;ball.rotation.set(0,0,0);phase='aim'}
+function placeBall(){const s=SPOTS[spot];shotDir.set(s[0],0,s[1]).normalize();ball.position.set(s[0]+shotDir.x*.7+shotDir.z*.3,1.74,s[1]+shotDir.z*.7-shotDir.x*.3);ball.visible=true;ball.rotation.set(0,0,0);phase='aim'}
 function addCount(v,cls){const i=document.createElement('i');i.textContent=v;if(cls)i.className=cls;$('count').append(i)}
 
 let hold=false,power=0,dirUp=1,ballSt=null;
