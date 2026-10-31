@@ -171,7 +171,7 @@ addEventListener('keydown',e=>{if(e.code==='Space'&&!e.repeat&&phase==='aim'){ho
 $('minus').onclick=()=>{if(balls>1){balls--;render()}};$('plus').onclick=()=>{if(balls<MAXB){balls++;render()}};$('go').onclick=play;
 
 // camera
-let camTo='plan';const camP=new THREE.Vector3(0,7.6,16.5),look=new THREE.Vector3(0,1.5,5),wantP=new THREE.Vector3(),wantL=new THREE.Vector3();
+let camTo='plan';const camP=new THREE.Vector3(0,10.5,16),look=new THREE.Vector3(0,1.5,5),wantP=new THREE.Vector3(),wantL=new THREE.Vector3();
 cam.position.copy(camP);
 addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight)});
 
@@ -185,7 +185,7 @@ function step(dt){t0+=dt;
  else if(ball.visible&&phase!=='aim'&&phase!=='plan'&&!ballSt){freeT+=dt;vel.y-=9.8*dt;ball.position.addScaledVector(vel,dt);ball.rotation.x-=vel.length()*dt*2;if(ball.position.y<.122){ball.position.y=.122;vel.y=Math.abs(vel.y)*.62;vel.x*=.8;vel.z*=.8}}
  net.scale.y+=(1-net.scale.y)*Math.min(1,dt*9);
  cheer=Math.max(0,cheer-dt);
- if(camTo==='plan'){wantP.set(0,7.6,16.5);wantL.set(0,2,3.4)}else{const s=SPOTS[spot],d=tmp.set(s[0],0,s[1]).normalize();wantP.set(s[0]+d.x*1.9,1.95,s[1]+d.z*1.9);wantL.set(0,2.75,0)}
+ if(camTo==='plan'){wantP.set(0,10.5,16);wantL.set(0,-1.6,3.2)}else{const s=SPOTS[spot],d=tmp.set(s[0],0,s[1]).normalize();wantP.set(s[0]+d.x*1.9,1.95,s[1]+d.z*1.9);wantL.set(0,2.75,0)}
  const k=Math.min(1,dt*3.2);camP.lerp(wantP,k);look.lerp(wantL,k);cam.position.copy(camP);cam.lookAt(look);
  if(cheer>0||t0<.05){crowd.forEach((p,i)=>{if(p[1]<0)return;const j=Math.abs(Math.sin(t0*9+p[3]))*.16*Math.min(cheer,1);M.makeTranslation(p[0],p[1]+j,p[2]);pers.setMatrixAt(i,M);M.makeTranslation(p[0],p[1]+.46+j,p[2]);heads.setMatrixAt(i,M)});pers.instanceMatrix.needsUpdate=heads.instanceMatrix.needsUpdate=true}
  if(confT>0){confT-=dt;const o=new THREE.Object3D();bits.forEach((b,i)=>{b.y-=b.v*dt;b.s+=dt*5;o.position.set(b.x+Math.sin(b.s)*.3,b.y,b.z);o.rotation.set(b.s,b.s*.7,0);o.updateMatrix();conf.setMatrixAt(i,o.matrix)});conf.instanceMatrix.needsUpdate=true;if(confT<=0)conf.visible=false}}
