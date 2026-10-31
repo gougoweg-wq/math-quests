@@ -1,0 +1,45 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hoop Maths</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#070a12;color:#f4f6fb;font:800 20px/1.2 "Barlow Condensed",system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
+canvas{position:fixed;inset:0;display:block}
+button{font:inherit;color:inherit;cursor:pointer;border:0}
+#hud{position:fixed;inset:0;pointer-events:none}
+#top{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:stretch;background:#0b1020e6;border-bottom:4px solid #ff7a1a;border-radius:6px;overflow:hidden;box-shadow:0 8px 24px #0009}
+#top div{padding:6px 20px;text-align:center;min-width:104px}#top small{display:block;font-size:14px;letter-spacing:1.5px;color:#9fb0cf}
+#top b{font:400 40px/1 Anton,sans-serif;letter-spacing:1px}#top .t b{color:#ffcf33}#top .s{background:#16203a}
+#mission{position:absolute;top:96px;left:50%;transform:translateX(-50%);max-width:92vw;background:#ff7a1a;color:#190b00;padding:6px 18px;border-radius:4px;font-size:clamp(20px,3vw,26px);text-align:center;white-space:nowrap}
+#quarter{position:absolute;left:16px;top:16px;font:400 24px Anton,sans-serif;text-shadow:0 2px 8px #000}#quarter span{color:#ffcf33;margin-left:8px;letter-spacing:2px}
+#mute{position:absolute;right:16px;top:14px;pointer-events:auto;background:#0b1020d9;border-radius:4px;padding:7px 12px;font-size:16px}
+#plan{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);width:min(760px,calc(100vw - 24px));background:#0b1020ee;border-top:4px solid #ffcf33;border-radius:6px;padding:12px 14px;pointer-events:auto;box-shadow:0 10px 30px #000a}
+.row{display:flex;align-items:center;gap:10px;margin:4px 0}.lbl{width:64px;color:#9fb0cf;font-size:18px;flex:none}
+#spots{display:flex;gap:7px;flex:1}.sp{flex:1;height:52px;background:#1a2542;border-radius:5px;font:400 26px Anton,sans-serif}.sp small{font:800 12px "Barlow Condensed";display:block;color:#9fb0cf}.sp.on{background:#ffcf33;color:#1a1200}.sp.on small{color:#4b3a00}.sp:disabled{opacity:.3;cursor:not-allowed}
+#balls{display:flex;gap:3px;flex:1;align-items:center;min-height:44px;flex-wrap:nowrap;overflow:hidden}.bl{width:clamp(22px,3.7vw,36px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 34% 30%,#ffb066,#e8641a 58%,#8f3408);box-shadow:inset 0 0 0 1px #5a2206}
+.pm{width:50px;height:46px;background:#1a2542;border-radius:5px;font:400 28px Anton,sans-serif;flex:none}.pm:disabled{opacity:.3}
+#n{width:42px;text-align:center;font:400 32px Anton,sans-serif;color:#ffcf33;flex:none}
+#go{width:100%;height:52px;margin-top:6px;background:linear-gradient(#ff9a3d,#ff6a0e);color:#1c0b00;border-radius:5px;font:400 26px Anton,sans-serif;letter-spacing:1px}#go:disabled{background:#2a3350;color:#7d8aa8;cursor:not-allowed}
+#meter{position:absolute;right:26px;top:50%;width:34px;height:min(52vh,340px);transform:translateY(-50%);background:#0b1020e6;border:2px solid #fff5;border-radius:6px;overflow:hidden}#band{position:absolute;left:0;right:0;background:#35e07a}#pin{position:absolute;left:-2px;right:-2px;height:6px;background:#fff;box-shadow:0 0 10px #fff}
+#tip{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);font-size:26px;text-shadow:0 2px 8px #000;white-space:nowrap}
+#count{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);display:flex;gap:7px;max-width:94vw;flex-wrap:nowrap}#count i{font:400 30px Anton,sans-serif;background:#0b1020e6;padding:4px 13px;border-radius:4px;border-bottom:3px solid #35e07a;animation:pop .28s}#count i.b{border-color:#ff4b4b;color:#ff8b8b}#count i.w{border-color:#ffffff30;color:#ffffff80}
+@keyframes pop{from{transform:scale(1.6)}}
+#toast{position:absolute;left:50%;top:32%;transform:translateX(-50%);font:400 clamp(44px,8vw,78px) Anton,sans-serif;letter-spacing:2px;text-shadow:0 4px 18px #000;opacity:0;transition:opacity .2s;white-space:nowrap}
+[hidden]{display:none!important}
+#ov{position:fixed;inset:0;display:grid;place-items:center;background:#05070dcc;padding:16px;z-index:5}
+#box{width:min(600px,100%);background:#0e1426;border-top:5px solid #ff7a1a;border-radius:6px;padding:22px 24px;text-align:center}
+#box h1{margin:0 0 6px;font:400 clamp(38px,7vw,56px) Anton,sans-serif;letter-spacing:1px}#box p{margin:6px 0;font-size:23px;color:#d6dff0}
+#box .eq{font:400 clamp(36px,6vw,48px) Anton,sans-serif;color:#ffcf33;margin:4px 0}#box .eq.g{color:#7cf0a8}#stars{font:400 36px Anton,sans-serif;color:#ffcf33;letter-spacing:6px}
+#act{margin-top:12px;background:linear-gradient(#ff9a3d,#ff6a0e);color:#1c0b00;border-radius:5px;padding:12px 40px;font:400 26px Anton,sans-serif;letter-spacing:1px}
+#load{height:6px;background:#fff2;border-radius:3px;overflow:hidden;margin-top:12px}#load i{display:block;height:100%;width:0;background:#ff7a1a}
+@media(max-height:560px){#mission{top:78px;font-size:18px}#top b{font-size:28px}#top small{font-size:12px}.sp{height:42px}#go{height:42px;font-size:20px}}
+</style></head><body>
+<div id="hud" hidden>
+<div id="quarter"></div><button id="mute" type="button">Sound off</button>
+<div id="top"><div class="t"><small>TARGET</small><b id="tgt">0</b></div><div class="s"><small>SCORE</small><b id="sc">0</b></div><div><small>BALLS</small><b id="bl">0</b></div></div>
+<div id="mission"></div>
+<div id="plan"><div class="row"><div class="lbl">Spot</div><div id="spots"></div></div><div class="row"><div class="lbl">Balls</div><button class="pm" id="minus" type="button">−</button><div id="balls"></div><div id="n">0</div><button class="pm" id="plus" type="button">+</button></div><button id="go" type="button">PLAY</button></div>
+<div id="meter" hidden><div id="band"></div><div id="pin"></div></div><div id="tip" hidden>Hold, then let go in the green</div><div id="count"></div><div id="toast"></div>
+</div>
+<div id="ov"><div id="box"><h1>Hoop Maths</h1><p>Loading the arena…</p><div id="load"><i></i></div></div></div>
+<script type="module" src="game.js"></script>
+</body></html>
