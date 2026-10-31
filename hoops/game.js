@@ -71,7 +71,7 @@ netG.setAttribute('position',new THREE.Float32BufferAttribute(netP,3));
 const net=new THREE.LineSegments(netG,new THREE.LineBasicMaterial({color:0xf5f7ff,transparent:true,opacity:.92}));net.position.copy(HOOP);hoop.add(net);
 
 // arena
-const wall=new THREE.MeshStandardMaterial({color:0x101a33,roughness:.8});
+const wall=new THREE.MeshStandardMaterial({color:0x24365f,roughness:.8});
 const add=(g,m,x,y,z,sh)=>{const o=new THREE.Mesh(g,m);o.position.set(x,y,z);if(sh)o.receiveShadow=true;scene.add(o);return o};
 add(new THREE.BoxGeometry(60,20,.5),wall,0,10,-9);add(new THREE.BoxGeometry(60,20,.5),wall,0,10,34);
 add(new THREE.BoxGeometry(.5,20,50),wall,-24,10,10);add(new THREE.BoxGeometry(.5,20,50),wall,24,10,10);
@@ -81,10 +81,10 @@ for(const x of [-9,0,9])for(const z of [0,8,16])add(new THREE.BoxGeometry(3.6,.1
 // stands and crowd
 const standMat=new THREE.MeshStandardMaterial({color:0x162444,roughness:.7});
 const crowd=[],kits=[0xff6a1a,0x2d7dff,0xf2f4fa,0xffcf33,0x23c26a,0xd8324f,0x1a2240];
-const addRow=(sx,sz,w,row,along)=>{const h=.7+row*.62,o=7.4+row*.88;const px=along?0:sx*(16+row*.88),pz=along?sz*0+(-5-0)+0:sz;
- if(along){const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,.9),standMat);b.position.set(0,h/2,31-(-row*0)-(4-row)*.9-1);scene.add(b);for(let x=-w/2+.5;x<w/2;x+=.68)crowd.push([x+Math.random()*.1,h+.42,b.position.z])}
- else{const b=new THREE.Mesh(new THREE.BoxGeometry(.9,h,w),standMat);b.position.set(px,h/2,pz);b.receiveShadow=true;scene.add(b);for(let z=pz-w/2+.5;z<pz+w/2;z+=.68)crowd.push([px,h+.42,z+Math.random()*.1])}};
-for(let r=0;r<7;r++){addRow(-1,9,27,r);addRow(1,9,27,r)}
+const seat=(x,y,z)=>crowd.push([x,y,z]);
+const sideRow=(sx,row)=>{const h=.7+row*.62,x=sx*(16.4+row*.88),b=new THREE.Mesh(new THREE.BoxGeometry(.9,h,27),standMat);b.position.set(x,h/2,9);b.receiveShadow=true;scene.add(b);for(let z=-3.9;z<22;z+=.68)seat(x,h+.42,z+Math.random()*.1)};
+const endRow=row=>{const h=.7+row*.62,z=-3.6-row*.88,b=new THREE.Mesh(new THREE.BoxGeometry(34,h,.9),standMat);b.position.set(0,h/2,z);b.receiveShadow=true;scene.add(b);for(let x=-16.5;x<16.5;x+=.68)seat(x+Math.random()*.1,h+.42,z)};
+for(let r=0;r<7;r++){sideRow(-1,r);sideRow(1,r);if(r<6)endRow(r)}
 const pers=new THREE.InstancedMesh(new THREE.CapsuleGeometry(.21,.42,4,10),new THREE.MeshStandardMaterial({roughness:.75}),crowd.length);
 const heads=new THREE.InstancedMesh(new THREE.SphereGeometry(.16,14,12),new THREE.MeshStandardMaterial({roughness:.6}),crowd.length);
 const M=new THREE.Matrix4(),C=new THREE.Color();const skin=[0xf0c8a0,0xc48e62,0x8c5a38,0x5e3c28];
@@ -95,12 +95,13 @@ const ad=canvasTex(1024,128,g=>{g.fillStyle='#0d1730';g.fillRect(0,0,1024,128);g
 for(const x of [-14.9,14.9]){const b=add(new THREE.BoxGeometry(.1,1,26),new THREE.MeshStandardMaterial({color:0x0d1730,emissive:0xffffff,emissiveMap:ad,emissiveIntensity:.8,map:ad}),x,.5,9);ad.wrapS=THREE.RepeatWrapping;b.castShadow=true}
 // wall scoreboard
 const sbCanvas=document.createElement('canvas');sbCanvas.width=1024;sbCanvas.height=420;const sbg=sbCanvas.getContext('2d');const sbTex=new THREE.CanvasTexture(sbCanvas);sbTex.colorSpace=THREE.SRGBColorSpace;
-const sb=new THREE.Mesh(new THREE.PlaneGeometry(9,3.7),new THREE.MeshBasicMaterial({map:sbTex}));sb.position.set(0,7,-8.7);scene.add(sb);
+const sb=new THREE.Mesh(new THREE.PlaneGeometry(9,3.7),new THREE.MeshBasicMaterial({map:sbTex}));sb.position.set(0,8.2,-8.7);scene.add(sb);
 function drawBoard(){const g=sbg;g.fillStyle='#02040a';g.fillRect(0,0,1024,420);g.strokeStyle='#ff7a1a';g.lineWidth=10;g.strokeRect(8,8,1008,404);g.textAlign='center';g.textBaseline='middle';g.font='400 58px Anton,Impact,sans-serif';g.fillStyle='#9fb0cf';g.fillText('TARGET',256,88);g.fillText('SCORE',768,88);g.font='400 230px Anton,Impact,sans-serif';g.fillStyle='#ffcf33';g.fillText(ROUNDS[R]?ROUNDS[R].target:0,256,262);g.fillStyle=score>(ROUNDS[R]?.target??0)?'#ff5a5a':'#ff3d2e';g.fillText(score,768,262);sbTex.needsUpdate=true}
 // lights
 const key=new THREE.SpotLight(0xfff1dc,420,60,.8,.55,1.5);key.position.set(0,16,7);key.target.position.set(0,0,5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.bias=-.0004;scene.add(key,key.target);
 const s2=new THREE.SpotLight(0xdce8ff,170,40,.5,.6,1.5);s2.position.set(0,14,-3);s2.target.position.copy(HOOP);scene.add(s2,s2.target);
 scene.add(new THREE.HemisphereLight(0xaabbe0,0x3a2616,.9));
+{const l=new THREE.SpotLight(0xffe9c8,620,36,1.05,.7,1.4);l.position.set(0,15,1);l.target.position.set(0,2,-7);scene.add(l,l.target)}
 for(const x of [-13,13]){const l=new THREE.SpotLight(0xffe9c8,520,34,.95,.7,1.4);l.position.set(x*.2,15,9);l.target.position.set(x*1.35,2,9);scene.add(l,l.target)}
 
 // ball
@@ -135,7 +136,7 @@ function play(){if(phase!=='plan')return;phase='aim';left=balls;score=0;$('plan'
 let bandLo=.5,bandHi=.7;
 function setBand(){const w=BAND[spot],c=.62;bandLo=c-w/2;bandHi=c+w/2;const b=$('band');b.style.bottom=bandLo*100+'%';b.style.height=w*100+'%'}
 const shotDir=new THREE.Vector3();
-function placeBall(){const s=SPOTS[spot];shotDir.set(s[0],0,s[1]).normalize();ball.position.set(s[0]-shotDir.x*.3+shotDir.z*.26,1.42,s[1]-shotDir.z*.3-shotDir.x*.26);ball.visible=true;ball.rotation.set(0,0,0);phase='aim'}
+function placeBall(){const s=SPOTS[spot];shotDir.set(s[0],0,s[1]).normalize();ball.position.set(s[0]+shotDir.x*.95+shotDir.z*.24,1.56,s[1]+shotDir.z*.95-shotDir.x*.24);ball.visible=true;ball.rotation.set(0,0,0);phase='aim'}
 function addCount(v,cls){const i=document.createElement('i');i.textContent=v;if(cls)i.className=cls;$('count').append(i)}
 
 let hold=false,power=0,dirUp=1,ballSt=null;
