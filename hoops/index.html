@@ -31,6 +31,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 #box .eq{font:400 clamp(36px,6vw,48px) Anton,sans-serif;color:#ffcf33;margin:4px 0}#box .eq.g{color:#7cf0a8}#stars{font:400 36px Anton,sans-serif;color:#ffcf33;letter-spacing:6px}
 #act{margin-top:12px;background:linear-gradient(#ff9a3d,#ff6a0e);color:#1c0b00;border-radius:5px;padding:12px 40px;font:400 26px Anton,sans-serif;letter-spacing:1px}
 #load{height:6px;background:#fff2;border-radius:3px;overflow:hidden;margin-top:12px}#load i{display:block;height:100%;width:0;background:#ff7a1a}
+@media(min-aspect-ratio:4/3){#plan{left:16px;transform:none;width:min(350px,34vw);bottom:16px}.row{flex-wrap:wrap}#spots{flex-basis:100%}.lbl{width:auto}.sp small{display:none}#balls{flex-wrap:wrap;min-height:34px}.bl{width:22px}#mission{white-space:normal}}
 @media(max-height:560px){#mission{top:78px;font-size:18px}#top b{font-size:28px}#top small{font-size:12px}.sp{height:42px}#go{height:42px;font-size:20px}}
 </style></head><body>
 <div id="hud" hidden>
@@ -41,5 +42,5 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 <div id="meter" hidden><div id="band"></div><div id="pin"></div></div><div id="tip" hidden>Hold, then let go in the green</div><div id="count"></div><div id="toast"></div>
 </div>
 <div id="ov"><div id="box"><h1>Hoop Maths</h1><p>Loading the arena…</p><div id="load"><i></i></div></div></div>
-<script type="module" src="game.js?v=5"></script>
+<script type="module" src="game.js?v=6"></script>
 </body></html>
