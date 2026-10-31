@@ -24,18 +24,18 @@ const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-per
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 document.body.prepend(renderer.domElement);
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x060810);scene.fog=new THREE.Fog(0x060810,32,70);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x060810);scene.fog=new THREE.Fog(0x060810,45,90);
 const cam=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,120);
 const composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,cam));
-const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),.32,.6,.92);composer.addPass(bloom);composer.addPass(new OutputPass());
+const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),.16,.5,1);composer.addPass(bloom);composer.addPass(new OutputPass());
 
 const load=$('load').firstChild;
 const mgr=new THREE.LoadingManager();mgr.onProgress=(u,a,b)=>load.style.width=a/b*100+'%';
 const tl=new THREE.TextureLoader(mgr);
 const tex=(f,srgb)=>{const t=tl.load(f);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(5,3);t.anisotropy=8;if(srgb)t.colorSpace=THREE.SRGBColorSpace;return t};
-new RGBELoader(mgr).load('assets/gym.hdr',t=>{t.mapping=THREE.EquirectangularReflectionMapping;const p=new THREE.PMREMGenerator(renderer);scene.environment=p.fromEquirectangular(t).texture;scene.environmentIntensity=.55;t.dispose();p.dispose()});
+new RGBELoader(mgr).load('assets/gym.hdr',t=>{t.mapping=THREE.EquirectangularReflectionMapping;const p=new THREE.PMREMGenerator(renderer);scene.environment=p.fromEquirectangular(t).texture;scene.environmentIntensity=.42;t.dispose();p.dispose()});
 
-const floor=new THREE.Mesh(new THREE.PlaneGeometry(34,24),new THREE.MeshStandardMaterial({map:tex('assets/floor_diff.jpg',1),normalMap:tex('assets/floor_nor.jpg'),roughnessMap:tex('assets/floor_rough.jpg'),roughness:.55,metalness:.05,color:0xffc690}));
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(34,24),new THREE.MeshStandardMaterial({map:tex('assets/floor_diff.jpg',1),normalMap:tex('assets/floor_nor.jpg'),roughnessMap:tex('assets/floor_rough.jpg'),roughness:.55,metalness:.05,color:0xe6b98a}));
 floor.rotation.x=-Math.PI/2;floor.position.z=8;floor.receiveShadow=true;scene.add(floor);
 
 function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),c);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t}
@@ -50,7 +50,7 @@ lm.rotation.x=-Math.PI/2;lm.position.set(0,.006,8);lm.receiveShadow=true;scene.a
 // spot discs
 const discs={};
 for(const p of PTS){const t=canvasTex(256,256,g=>{g.fillStyle='#ffcf33';g.beginPath();g.arc(128,128,122,0,7);g.fill();g.fillStyle='#0b1020';g.beginPath();g.arc(128,128,102,0,7);g.fill();g.fillStyle='#ffcf33';g.font='400 118px Anton,Impact,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(p,128,136)});
- const m=new THREE.Mesh(new THREE.CircleGeometry(.85,48),new THREE.MeshStandardMaterial({map:t,transparent:true,emissive:0xffffff,emissiveMap:t,emissiveIntensity:.42,polygonOffset:true,polygonOffsetFactor:-4}));
+ const m=new THREE.Mesh(new THREE.CircleGeometry(.85,48),new THREE.MeshStandardMaterial({map:t,transparent:true,emissive:0xffffff,emissiveMap:t,emissiveIntensity:.55,polygonOffset:true,polygonOffsetFactor:-4}));
  m.rotation.x=-Math.PI/2;m.position.set(SPOTS[p][0],.014,SPOTS[p][1]);m.userData.p=p;scene.add(m);discs[p]=m}
 
 // hoop
@@ -95,12 +95,13 @@ const ad=canvasTex(1024,128,g=>{g.fillStyle='#0d1730';g.fillRect(0,0,1024,128);g
 for(const x of [-14.9,14.9]){const b=add(new THREE.BoxGeometry(.1,1,26),new THREE.MeshStandardMaterial({color:0x0d1730,emissive:0xffffff,emissiveMap:ad,emissiveIntensity:.8,map:ad}),x,.5,9);ad.wrapS=THREE.RepeatWrapping;b.castShadow=true}
 // wall scoreboard
 const sbCanvas=document.createElement('canvas');sbCanvas.width=1024;sbCanvas.height=420;const sbg=sbCanvas.getContext('2d');const sbTex=new THREE.CanvasTexture(sbCanvas);sbTex.colorSpace=THREE.SRGBColorSpace;
-const sb=new THREE.Mesh(new THREE.PlaneGeometry(9,3.7),new THREE.MeshBasicMaterial({map:sbTex}));sb.position.set(0,9.6,-8.7);scene.add(sb);
+const sb=new THREE.Mesh(new THREE.PlaneGeometry(9,3.7),new THREE.MeshBasicMaterial({map:sbTex}));sb.position.set(0,7,-8.7);scene.add(sb);
 function drawBoard(){const g=sbg;g.fillStyle='#02040a';g.fillRect(0,0,1024,420);g.strokeStyle='#ff7a1a';g.lineWidth=10;g.strokeRect(8,8,1008,404);g.textAlign='center';g.textBaseline='middle';g.font='400 58px Anton,Impact,sans-serif';g.fillStyle='#9fb0cf';g.fillText('TARGET',256,88);g.fillText('SCORE',768,88);g.font='400 230px Anton,Impact,sans-serif';g.fillStyle='#ffcf33';g.fillText(ROUNDS[R]?ROUNDS[R].target:0,256,262);g.fillStyle=score>(ROUNDS[R]?.target??0)?'#ff5a5a':'#ff3d2e';g.fillText(score,768,262);sbTex.needsUpdate=true}
 // lights
-const key=new THREE.SpotLight(0xfff1dc,2200,60,.72,.45,1.6);key.position.set(0,16,7);key.target.position.set(0,0,5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.bias=-.0004;scene.add(key,key.target);
-const s2=new THREE.SpotLight(0xdce8ff,900,40,.5,.6,1.6);s2.position.set(0,14,-3);s2.target.position.copy(HOOP);scene.add(s2,s2.target);
-scene.add(new THREE.HemisphereLight(0x8aa0d0,0x301c10,.45));
+const key=new THREE.SpotLight(0xfff1dc,420,60,.8,.55,1.5);key.position.set(0,16,7);key.target.position.set(0,0,5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.bias=-.0004;scene.add(key,key.target);
+const s2=new THREE.SpotLight(0xdce8ff,170,40,.5,.6,1.5);s2.position.set(0,14,-3);s2.target.position.copy(HOOP);scene.add(s2,s2.target);
+scene.add(new THREE.HemisphereLight(0xaabbe0,0x3a2616,.9));
+for(const x of [-13,13]){const l=new THREE.SpotLight(0xffe9c8,520,34,.95,.7,1.4);l.position.set(x*.2,15,9);l.target.position.set(x*1.35,2,9);scene.add(l,l.target)}
 
 // ball
 const ballTex=canvasTex(1024,512,g=>{g.fillStyle='#e0601a';g.fillRect(0,0,1024,512);for(let i=0;i<9000;i++){g.fillStyle=`rgba(${Math.random()<.5?'90,30,0':'255,170,110'},.2)`;g.fillRect(Math.random()*1024,Math.random()*512,2,2)}g.strokeStyle='#1c0e06';g.lineWidth=11;g.beginPath();g.moveTo(0,256);g.lineTo(1024,256);g.moveTo(256,0);g.lineTo(256,512);g.moveTo(768,0);g.lineTo(768,512);g.stroke();for(const x of [0,512,1024]){g.beginPath();g.ellipse(x,256,180,300,0,0,7);g.stroke()}});
@@ -126,7 +127,7 @@ function render(){const r=round();$('tgt').textContent=r.target;$('sc').textCont
  $('mission').textContent=phase==='plan'?(r.spot?`Each shot is ${r.spot} points. How many balls for exactly ${r.target}?`:r.balls?`You have ${r.balls} balls. Which spot gives exactly ${r.target}?`:`Score exactly ${r.target}. You choose the spot and the balls.`):`${spot} points each · shoot all ${balls}`;
  setSpots();const b=$('balls');b.replaceChildren(...Array.from({length:balls},()=>Object.assign(document.createElement('i'),{className:'bl'})));$('n').textContent=balls;
  $('minus').disabled=r.balls!=null||balls<=1;$('plus').disabled=r.balls!=null||balls>=MAXB;
- for(const p of PTS){const on=p===spot,dis=r.spot!=null&&r.spot!==p;discs[p].material.opacity=dis?.25:1;discs[p].scale.setScalar(on?1.28:1);discs[p].material.emissiveIntensity=on?1.1:.42}
+ for(const p of PTS){const on=p===spot,dis=r.spot!=null&&r.spot!==p;discs[p].material.opacity=dis?.25:1;discs[p].scale.setScalar(on?1.28:1);discs[p].material.emissiveIntensity=on?1.25:.55}
  drawBoard()}
 function startRound(){const r=round();phase='plan';score=0;spot=r.spot??2;balls=r.balls??1;$('count').replaceChildren();$('plan').hidden=false;$('meter').hidden=true;$('tip').hidden=true;$('ov').hidden=true;ball.visible=false;fails=0;camTo='plan';render()}
 function replan(){phase='plan';score=0;$('count').replaceChildren();$('plan').hidden=false;$('meter').hidden=true;$('tip').hidden=true;$('ov').hidden=true;ball.visible=false;camTo='plan';render()}
@@ -169,7 +170,7 @@ addEventListener('keydown',e=>{if(e.code==='Space'&&!e.repeat&&phase==='aim'){ho
 $('minus').onclick=()=>{if(balls>1){balls--;render()}};$('plus').onclick=()=>{if(balls<MAXB){balls++;render()}};$('go').onclick=play;
 
 // camera
-let camTo='plan';const camP=new THREE.Vector3(0,8.5,19),look=new THREE.Vector3(0,1.5,5),wantP=new THREE.Vector3(),wantL=new THREE.Vector3();
+let camTo='plan';const camP=new THREE.Vector3(0,7.6,16.5),look=new THREE.Vector3(0,1.5,5),wantP=new THREE.Vector3(),wantL=new THREE.Vector3();
 cam.position.copy(camP);
 addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight)});
 
@@ -183,7 +184,7 @@ function step(dt){t0+=dt;
  else if(ball.visible&&phase!=='aim'&&phase!=='plan'&&!ballSt){freeT+=dt;vel.y-=9.8*dt;ball.position.addScaledVector(vel,dt);ball.rotation.x-=vel.length()*dt*2;if(ball.position.y<.122){ball.position.y=.122;vel.y=Math.abs(vel.y)*.62;vel.x*=.8;vel.z*=.8}}
  net.scale.y+=(1-net.scale.y)*Math.min(1,dt*9);
  cheer=Math.max(0,cheer-dt);
- if(camTo==='plan'){wantP.set(0,8.8,19.5);wantL.set(0,1.1,5.2)}else{const s=SPOTS[spot],d=tmp.set(s[0],0,s[1]).normalize();wantP.set(s[0]+d.x*1.9,1.95,s[1]+d.z*1.9);wantL.set(0,2.75,0)}
+ if(camTo==='plan'){wantP.set(0,7.6,16.5);wantL.set(0,2,3.4)}else{const s=SPOTS[spot],d=tmp.set(s[0],0,s[1]).normalize();wantP.set(s[0]+d.x*1.9,1.95,s[1]+d.z*1.9);wantL.set(0,2.75,0)}
  const k=Math.min(1,dt*3.2);camP.lerp(wantP,k);look.lerp(wantL,k);cam.position.copy(camP);cam.lookAt(look);
  if(cheer>0||t0<.05){crowd.forEach((p,i)=>{if(p[1]<0)return;const j=Math.abs(Math.sin(t0*9+p[3]))*.16*Math.min(cheer,1);M.makeTranslation(p[0],p[1]+j,p[2]);pers.setMatrixAt(i,M);M.makeTranslation(p[0],p[1]+.46+j,p[2]);heads.setMatrixAt(i,M)});pers.instanceMatrix.needsUpdate=heads.instanceMatrix.needsUpdate=true}
  if(confT>0){confT-=dt;const o=new THREE.Object3D();bits.forEach((b,i)=>{b.y-=b.v*dt;b.s+=dt*5;o.position.set(b.x+Math.sin(b.s)*.3,b.y,b.z);o.rotation.set(b.s,b.s*.7,0);o.updateMatrix();conf.setMatrixAt(i,o.matrix)});conf.instanceMatrix.needsUpdate=true;if(confT<=0)conf.visible=false}}
