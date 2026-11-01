@@ -27,15 +27,16 @@ canvas{position:fixed;inset:0;display:block}
 #box{background:#07110ef2;border-top:4px solid #3dffb0;border-radius:8px;padding:22px 30px;text-align:center;max-width:560px}
 #box h1{margin:0 0 8px;font:900 clamp(30px,6.4vw,48px) Orbitron,sans-serif;color:#3dffb0}#box p{margin:6px 0;font-size:20px}
 #act{margin-top:12px;border:0;border-radius:6px;padding:12px 40px;font:800 25px "Exo 2",sans-serif;background:linear-gradient(#5dffc2,#1fcf8d);color:#04120c;cursor:pointer}#act:disabled{background:#2a3a35;color:#7d918a}
+#step{margin-top:9px;padding-top:8px;border-top:1px solid #3dffb044;color:#ffd36b;font-size:18px}#step em{display:block;font:800 22px "Exo 2",sans-serif;font-style:normal;color:#fff;margin-bottom:4px}#step b{color:#3dffb0}.slot.next{border-color:#ffd36b;box-shadow:0 0 10px #ffd36b88}
 [hidden]{display:none!important}
 </style></head><body>
 <div id="hud">
-<div id="task"><small><span id="num"></span><span id="pts"></span></small><div id="txt"></div></div>
+<div id="task"><small><span id="num"></span><span id="pts"></span></small><div id="txt"></div><div id="step" hidden></div></div>
 <div id="scale"><small>ВЕСЫ, г</small><b id="mass">0</b></div>
 <div id="form" hidden><small id="tip"></small><div id="eq"></div><div id="tiles"></div></div>
 <div id="controls" hidden><button id="pour" type="button"></button><button id="test" type="button">Анализ</button><button id="again" type="button">Заново</button></div>
 <div id="res" hidden><h2 id="rt"></h2><div id="g"><div id="n"></div></div><div id="rd"></div><button id="rb" type="button"></button></div>
 </div>
 <div id="ov"><div id="box"><h1>ЛАБОРАТОРИЯ</h1><p>1. Собери уравнение из чисел.</p><p>2. Реши его и держи кнопку, пока весы не покажут нужное.</p><p>3. Нажми «Анализ».</p><button id="act" type="button" disabled>Загрузка…</button></div></div>
-<script type="module" src="game.js?v=5"></script>
+<script type="module" src="game.js?v=6"></script>
 </body></html>

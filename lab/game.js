@@ -15,8 +15,8 @@ const ROUNDS=[
  {k:'w',m:150,p:20,t:12,x:100,fake:[20]},
  {k:'h',m:300,p:6,t:10,x:120,fake:[6]},
  {k:'s',m:240,p:5,t:20,x:45,fake:[5]}];
-const MAX=520,TOL=.2,RATE={w:30,h:22,s:12,m:42},LABEL={w:'Держи: ВОДА',h:'Держи: НАГРЕВ',s:'Держи: СОЛЬ',m:'Держи: РАСТВОР 10%'};
-let R=0,x=0,on=false,done=false,points=0,tries=0,fill=[],burst=0;
+const MAX=520,TOL={w:6,h:5,s:2.5},RATE={w:30,h:22,s:12,m:42},LABEL={w:'Держи: ВОДА',h:'Держи: НАГРЕВ',s:'Держи: СОЛЬ',m:'Держи: РАСТВОР 10%'};
+let R=0,x=0,on=false,held=0,done=false,points=0,tries=0,fill=[],burst=0;
 const S=r=>r.m*r.p/100,T=r=>r.t/100;
 const mass=()=>{const r=ROUNDS[R];return r.k=='h'?r.m-x:r.m+x};
 const salt=()=>{const r=ROUNDS[R];return S(r)+(r.k=='s'?x:r.k=='m'?.1*x:0)};
@@ -41,7 +41,7 @@ const glowL=new THREE.PointLight(0x3dffb0,70,18);glowL.position.set(-8,5,-3);sce
 const glowR=new THREE.PointLight(0x2f8dff,70,18);glowR.position.set(8,5,-3);scene.add(glowR);
 
 // зеркальный стол
-const mirror=new Reflector(new THREE.PlaneGeometry(60,16),{textureWidth:1024,textureHeight:512,color:0x5a6468,clipBias:.003});mirror.rotation.x=-Math.PI/2;scene.add(mirror);
+const mirror=new Reflector(new THREE.PlaneGeometry(60,16),{textureWidth:1024,textureHeight:512,color:0x2c3336,clipBias:.003});mirror.rotation.x=-Math.PI/2;scene.add(mirror);
 const edge=new THREE.Mesh(new THREE.BoxGeometry(60,.05,.05),new THREE.MeshBasicMaterial({color:new THREE.Color(0x3dffb0).multiplyScalar(1.3)}));edge.position.set(0,.02,7.9);scene.add(edge);
 // стена с таблицей элементов
 const wc=document.createElement('canvas');wc.width=1024;wc.height=512;const w=wc.getContext('2d');w.fillStyle='#071016';w.fillRect(0,0,1024,512);w.font='bold 26px Arial';w.textAlign='center';
@@ -94,23 +94,25 @@ function setCrystals(v){crystals.forEach((m,i)=>m.scale.setScalar(.001+v*(.6+(i%
 
 // ---------- уравнение из карточек
 const SLOTS={w:r=>[['s'],['m','+ x'],['t']],h:r=>[['s'],['m','− x'],['t']],s:r=>[['s','+ x'],['m','+ x'],['t']],m:r=>[['s','+','k','· x'],['m','+ x'],['t']]};
+const fmt=v=>String(v).replace('.',',');
+const nextId=()=>Object.keys(answers(ROUNDS[R])).find(k=>fill[k]==null);
 function answers(r){const a={s:S(r),m:r.m,t:T(r)};if(r.k=='m')a.k=.1;return a}
 function drawEq(){const r=ROUNDS[R],sl=SLOTS[r.k](r),box=$('eq');box.innerHTML='';
- const cell=id=>{const e=document.createElement('span');e.className='slot'+(fill[id]!=null?' on':'');e.textContent=fill[id]??'?';e.onclick=()=>{fill[id]=null;drawEq();drawTiles()};return e};
+ const cell=id=>{const e=document.createElement('span');e.className='slot'+(fill[id]!=null?' on':'');e.textContent=fill[id]!=null?fmt(fill[id]):'?';if(id===nextId())e.classList.add('next');e.onclick=()=>{fill[id]=null;drawEq();drawTiles()};return e};
  const part=arr=>{const sp=document.createElement('span');arr.forEach(a=>{if('smtk'.includes(a))sp.append(cell(a));else sp.append(a)});return sp};
  const fr=document.createElement('span');fr.className='fr';fr.append(part(sl[0]),part(sl[1]));box.append(fr,' = ',cell('t'))}
 let pool=[];
 function drawTiles(){const box=$('tiles');box.innerHTML='';const used=Object.values(fill).filter(v=>v!=null);const left=[...used];
- pool.forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=v;const i=left.indexOf(v);if(i>=0){left.splice(i,1);b.disabled=true}b.onclick=()=>place(v);box.append(b)})}
+ pool.forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=fmt(v);const i=left.indexOf(v);if(i>=0){left.splice(i,1);b.disabled=true}b.onclick=()=>place(v);box.append(b)})}
 function place(v){const r=ROUNDS[R],a=answers(r),id=Object.keys(a).find(k=>fill[k]==null);if(!id)return;fill[id]=v;drawEq();drawTiles();
  if(Object.keys(a).every(k=>fill[k]!=null)){const bad=Object.keys(a).filter(k=>fill[k]!==a[k]);
-  if(!bad.length){$('form').hidden=true;$('controls').hidden=false;$('pour').textContent=LABEL[r.k]}
+  if(!bad.length){$('form').hidden=true;$('controls').hidden=false;$('pour').textContent=LABEL[r.k];const q=r.k=='h'?`${fmt(a.s)} / (${r.m} − x) = ${fmt(a.t)}`:r.k=='s'?`(${fmt(a.s)} + x) / (${r.m} + x) = ${fmt(a.t)}`:`${fmt(a.s)} / (${r.m} + x) = ${fmt(a.t)}`;$('step').hidden=false;$('step').innerHTML=`<em>${q}</em>Реши в тетради и найди x.<br>${{w:'Долей x г воды',h:'Выпари x г воды',s:'Досыпь x г соли'}[r.k]}: весы покажут <b>${r.m} ${r.k=='h'?'−':'+'} x</b>.`}
   else{tries++;bad.forEach(k=>fill[k]=null);drawEq();drawTiles();[...$('eq').querySelectorAll('.slot:not(.on)')].forEach(e=>e.classList.add('bad'))}}}
-function start(){const r=ROUNDS[R];x=0;done=false;tries=0;burst=0;setCrystals(0);$('res').hidden=true;$('controls').hidden=true;$('form').hidden=false;
+function start(){const r=ROUNDS[R];x=0;done=false;tries=0;burst=0;setCrystals(0);$('res').hidden=true;$('controls').hidden=true;$('form').hidden=false;$('step').hidden=true;
  $('num').textContent=`ПРОБА ${R+1} ИЗ ${ROUNDS.length}`;$('pts').textContent=points+' очк.';
  const T0={w:`В стакане <b>${r.m} г</b> раствора, соли <b>${r.p}%</b>. Сколько воды долить, чтобы стало <b>${r.t}%</b>?`,h:`В стакане <b>${r.m} г</b> раствора, соли <b>${r.p}%</b>. Сколько воды выпарить, чтобы стало <b>${r.t}%</b>?`,s:`В стакане <b>${r.m} г</b> раствора, соли <b>${r.p}%</b>. Сколько соли досыпать, чтобы стало <b>${r.t}%</b>?`,m:`В стакане <b>${r.m} г</b> раствора, соли <b>${r.p}%</b>. Сколько раствора <b>10%</b> влить, чтобы стало <b>${r.t}%</b>?`};
  $('txt').innerHTML=T0[r.k];fill={};const a=answers(r);pool=[...new Set([...Object.values(a),...r.fake])].sort((p,q)=>p-q);drawEq();drawTiles();$('tip').textContent=`Сначала найди соль: ${r.p}% от ${r.m} г. Она не меняется${r.k=='s'?', пока не досыпешь':''}`;show()}
-function test(){if(done)return;const r=ROUNDS[R],cn=conc(),ok=Math.abs(cn-r.t)<=TOL;$('res').hidden=false;
+function test(){if(done)return;const r=ROUNDS[R],cn=conc(),ok=Math.abs(x-r.x)<=TOL[r.k];$('res').hidden=false;
  const off=Math.max(-1,Math.min(1,(cn-r.t)/(r.t*.5)));$('n').style.left='50%';requestAnimationFrame(()=>$('n').style.left=(50+off*46)+'%');
  $('rt').textContent=ok?'ТОЧНО!':(cn>r.t?'Слишком крепкий':'Слишком слабый');$('rt').style.color=ok?'#3dffb0':'#ff8b6b';
  $('rd').textContent=`Анализ: ${cn.toFixed(1)}%, нужно ${r.t}%.`;
@@ -121,14 +123,14 @@ function test(){if(done)return;const r=ROUNDS[R],cn=conc(),ok=Math.abs(cn-r.t)<=
   $('rb').textContent=more?'Продолжить':'Начать заново';$('rb').onclick=()=>{$('res').hidden=true;if(!more){x=0;show()}}}}
 function finish(){const max=ROUNDS.length*100,k=points/max,rank=k>.9?'Профессор':k>.7?'Старший химик':k>.5?'Химик':'Лаборант';$('ov').hidden=false;$('box').innerHTML=`<h1>${rank}</h1><p>${points} очков из ${max}</p><button id="act" type="button">Ещё раз</button>`;$('act').onclick=()=>{R=0;points=0;$('ov').hidden=true;start()}}
 
-const b=$('pour'),go=e=>{e.preventDefault();if(!done)on=true},stop=()=>on=false;
+const b=$('pour'),go=e=>{e.preventDefault();if(!done){on=true;held=0}},stop=()=>on=false;
 b.addEventListener('pointerdown',go);b.addEventListener('pointerup',stop);b.addEventListener('pointerleave',stop);b.addEventListener('pointercancel',stop);
 $('test').onclick=test;$('again').onclick=()=>{if(done)return;x=0;$('res').hidden=true;show()};
 $('act').onclick=()=>{$('ov').hidden=true;start()};
 
 const clock=new THREE.Clock();
-renderer.setAnimationLoop(()=>{const d=Math.min(clock.getDelta(),.05),now=performance.now()/1000,r=ROUNDS[R];
- if(on&&!done){const lim=r.k=='h'?r.m-S(r)-20:MAX-r.m;if(x<lim){x+=RATE[r.k]*d;show()}}
+renderer.setAnimationLoop(()=>{const raw=Math.min(clock.getDelta(),.2),d=Math.min(raw,.05),now=performance.now()/1000,r=ROUNDS[R];
+ if(on&&!done){const lim=r.k=='h'?r.m-S(r)-20:MAX-r.m;held+=raw;if(x<lim){x+=RATE[r.k]*raw*Math.min(1,.2+held*.9);show()}}
  const top=surf.position.y,flow=on&&(r.k=='w'||r.k=='m'),amp=on?.05:.012;
  stream.visible=flow;if(flow){const h=7.9-top;stream.scale.set(.9+Math.sin(now*40)*.12,h,.9+Math.sin(now*40)*.12);stream.position.set(.4,top+h/2,0);stream.material.color.set(r.k=='m'?0xffc27a:0xbfeaff)}
  grains.forEach(s=>{s.visible=on&&r.k=='s';if(s.visible){s.position.y-=d*7;s.position.x=.4+Math.sin(s.id*3)*.16;if(s.position.y<top)s.position.y=7.9}});
