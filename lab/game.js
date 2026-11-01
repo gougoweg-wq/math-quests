@@ -10,13 +10,11 @@ import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 const $=id=>document.getElementById(id);
 // k: w вода, h выпаривание, s соль, m второй раствор 10%; x: ответ для проверки
 const ROUNDS=[
- {k:'w',m:200,p:15,t:10,x:100,fake:[15,10,.15]},
- {k:'w',m:100,p:20,t:10,x:100,fake:[10,.2,200]},
- {k:'w',m:150,p:20,t:12,x:100,fake:[20,12,.2]},
- {k:'h',m:300,p:6,t:10,x:120,fake:[6,10,.06]},
- {k:'s',m:240,p:5,t:20,x:45,fake:[5,20,.05]},
- {k:'m',m:100,p:30,t:15,x:300,fake:[15,10,.3]},
- {k:'w',m:120,p:15,t:9,x:80,fake:[15,9,.15]}];
+ {k:'w',m:200,p:15,t:10,x:100,fake:[15]},
+ {k:'w',m:100,p:20,t:10,x:100,fake:[20]},
+ {k:'w',m:150,p:20,t:12,x:100,fake:[20]},
+ {k:'h',m:300,p:6,t:10,x:120,fake:[6]},
+ {k:'s',m:240,p:5,t:20,x:45,fake:[5]}];
 const MAX=520,TOL=.2,RATE={w:30,h:22,s:12,m:42},LABEL={w:'Держи: ВОДА',h:'Держи: НАГРЕВ',s:'Держи: СОЛЬ',m:'Держи: РАСТВОР 10%'};
 let R=0,x=0,on=false,done=false,points=0,tries=0,fill=[],burst=0;
 const S=r=>r.m*r.p/100,T=r=>r.t/100;
@@ -111,7 +109,7 @@ function place(v){const r=ROUNDS[R],a=answers(r),id=Object.keys(a).find(k=>fill[
 function start(){const r=ROUNDS[R];x=0;done=false;tries=0;burst=0;setCrystals(0);$('res').hidden=true;$('controls').hidden=true;$('form').hidden=false;
  $('num').textContent=`ПРОБА ${R+1} ИЗ ${ROUNDS.length}`;$('pts').textContent=points+' очк.';
  const T0={w:`В стакане <b>${r.m} г</b> раствора, соли <b>${r.p}%</b>. Сколько воды долить, чтобы стало <b>${r.t}%</b>?`,h:`В стакане <b>${r.m} г</b> раствора, соли <b>${r.p}%</b>. Сколько воды выпарить, чтобы стало <b>${r.t}%</b>?`,s:`В стакане <b>${r.m} г</b> раствора, соли <b>${r.p}%</b>. Сколько соли досыпать, чтобы стало <b>${r.t}%</b>?`,m:`В стакане <b>${r.m} г</b> раствора, соли <b>${r.p}%</b>. Сколько раствора <b>10%</b> влить, чтобы стало <b>${r.t}%</b>?`};
- $('txt').innerHTML=T0[r.k];fill={};const a=answers(r);pool=[...new Set([...Object.values(a),...r.fake])].sort((p,q)=>p-q);drawEq();drawTiles();show()}
+ $('txt').innerHTML=T0[r.k];fill={};const a=answers(r);pool=[...new Set([...Object.values(a),...r.fake])].sort((p,q)=>p-q);drawEq();drawTiles();$('tip').textContent=`Сначала найди соль: ${r.p}% от ${r.m} г. Она не меняется${r.k=='s'?', пока не досыпешь':''}`;show()}
 function test(){if(done)return;const r=ROUNDS[R],cn=conc(),ok=Math.abs(cn-r.t)<=TOL;$('res').hidden=false;
  const off=Math.max(-1,Math.min(1,(cn-r.t)/(r.t*.5)));$('n').style.left='50%';requestAnimationFrame(()=>$('n').style.left=(50+off*46)+'%');
  $('rt').textContent=ok?'ТОЧНО!':(cn>r.t?'Слишком крепкий':'Слишком слабый');$('rt').style.color=ok?'#3dffb0':'#ff8b6b';
@@ -119,7 +117,7 @@ function test(){if(done)return;const r=ROUNDS[R],cn=conc(),ok=Math.abs(cn-r.t)<=
  if(ok){done=true;const p=Math.max(40,100-tries*20-Math.round(Math.abs(x-r.x)*2));points+=p;$('pts').textContent=points+' очк.';burst=1;
   sparks.forEach(o=>{o.s.visible=true;o.s.position.set(Math.random()*2-1,surf.position.y,Math.random()*2-1);o.v.set(Math.random()*6-3,3+Math.random()*7,Math.random()*6-3)});
   $('rd').textContent+=` +${p} очков`;$('rb').textContent=R<ROUNDS.length-1?'Следующая проба':'Итог';$('rb').onclick=()=>{R++;if(R<ROUNDS.length)start();else finish()}}
- else{tries++;const more=(r.k=='w'||r.k=='h'||r.k=='m')?cn>r.t&&r.k!='h'||(r.k=='h'&&cn<r.t):cn<r.t;
+ else{tries++;const more=r.k=='w'?cn>r.t:cn<r.t;
   $('rb').textContent=more?'Продолжить':'Начать заново';$('rb').onclick=()=>{$('res').hidden=true;if(!more){x=0;show()}}}}
 function finish(){const max=ROUNDS.length*100,k=points/max,rank=k>.9?'Профессор':k>.7?'Старший химик':k>.5?'Химик':'Лаборант';$('ov').hidden=false;$('box').innerHTML=`<h1>${rank}</h1><p>${points} очков из ${max}</p><button id="act" type="button">Ещё раз</button>`;$('act').onclick=()=>{R=0;points=0;$('ov').hidden=true;start()}}
 
