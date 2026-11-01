@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Ten Truck</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#bfe6ff;font:800 24px/1.15 ui-rounded,"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;color:#17324d;user-select:none;-webkit-user-select:none;touch-action:none}
+canvas{position:fixed;inset:0;display:block}
+#hud{position:fixed;inset:0;pointer-events:none}
+#eq{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:#fffffff2;border-radius:18px;padding:8px 26px;font-size:clamp(38px,8vw,64px);white-space:nowrap;box-shadow:0 8px 0 #0002}
+#eq b{color:#e8541e}#eq i{font-style:normal;color:#1c7ed6}
+#say{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#17324de8;color:#fff;border-radius:14px;padding:9px 20px;font-size:clamp(20px,3.6vw,28px);white-space:nowrap;max-width:96vw;text-align:center}
+#stars{position:absolute;top:16px;left:16px;font-size:26px;background:#fff9;border-radius:12px;padding:5px 12px}
+#snd{position:absolute;top:14px;right:14px;pointer-events:auto;border:0;background:#fff9;border-radius:12px;padding:8px 12px;font:inherit;font-size:18px;color:inherit;cursor:pointer}
+#next{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);pointer-events:auto;border:0;border-radius:16px;background:#2fbf71;color:#fff;font:inherit;font-size:30px;padding:12px 44px;box-shadow:0 7px 0 #1c8a4f;cursor:pointer}
+#ov{position:fixed;inset:0;display:grid;place-items:center;background:#17324dcc;padding:16px;z-index:5}
+#box{background:#fff;border-radius:24px;padding:24px 30px;text-align:center;max-width:520px}
+#box h1{margin:0 0 8px;font-size:clamp(40px,8vw,58px);color:#e8541e}#box p{margin:6px 0;font-size:24px}
+#act{margin-top:12px;border:0;border-radius:16px;background:#2fbf71;color:#fff;font:inherit;font-size:30px;padding:12px 44px;box-shadow:0 7px 0 #1c8a4f;cursor:pointer}
+[hidden]{display:none!important}
+</style></head><body>
+<div id="hud"><div id="stars"></div><button id="snd" type="button">Sound on</button><div id="eq"></div><div id="say"></div><button id="next" type="button" hidden>Next truck</button></div>
+<div id="ov"><div id="box"><h1>Ten Truck</h1><p>The truck takes exactly 10 blocks.</p><p>Tap a gap to cut the blue row.</p><button id="act" type="button">Play</button></div></div>
+<script type="module" src="game.js?v=1"></script>
+</body></html>
