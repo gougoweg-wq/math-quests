@@ -61,7 +61,7 @@ function test(){if(done)return;const r=ROUNDS[R],cn=conc(),ok=Math.abs(cn-r.t)<=
  const added=water+salt;$('rt').textContent=ok?'ТОЧНО!':(cn>r.t?'Слишком крепкий':'Слишком слабый');$('rt').style.color=ok?'#3dffb0':'#ff8b6b';
  $('rd').textContent=`Концентрация ${cn.toFixed(1)}%, нужно ${r.t}%. Добавлено ${Math.round(added)} г.`;
  if(ok){done=true;if(tries==0)score++;$('rb').textContent=R<ROUNDS.length-1?'Следующая проба':'Готово';$('rb').onclick=()=>{R++;if(R<ROUNDS.length)start();else finish()}}
- else{tries++;$('rb').textContent=cn>r.t?'Долить ещё':'Начать заново';$('rb').onclick=()=>{$('res').hidden=true;hint();if(cn<r.t&&r.add=='w'){water=0;salt=0;show()}else if(cn<r.t||r.add=='s'&&cn>r.t){if(cn>r.t){water=0;salt=0;show()}}}}}
+ else{tries++;const more=r.add=='w'?cn>r.t:cn<r.t;$('rb').textContent=more?'Добавить ещё':'Начать заново';$('rb').onclick=()=>{$('res').hidden=true;hint();if(!more){water=0;salt=0;show()}}}}
 function finish(){$('ov').hidden=false;$('box').innerHTML=`<h1>ГОТОВО</h1><p>С первой попытки: ${score} из ${ROUNDS.length}</p><button id="act" type="button">Ещё раз</button>`;$('act').onclick=()=>{R=0;score=0;$('ov').hidden=true;start()}}
 
 const hold=(b,k)=>{const on=e=>{e.preventDefault();if(!done)pouring=k},off=()=>pouring=null;b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointerleave',off);b.addEventListener('pointercancel',off)};
