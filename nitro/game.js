@@ -34,7 +34,7 @@ const rimL=new THREE.PointLight(0xff2bd6,60,30);rimL.position.set(-7,3,3);scene.
 const rimR=new THREE.PointLight(0x27e4ff,60,30);rimR.position.set(7,3,3);scene.add(rimR);
 
 // ---------- wet road: the mirrored car shows through a semi-transparent floor
-const road=new THREE.Mesh(new THREE.PlaneGeometry(240,60),new THREE.MeshStandardMaterial({color:0x05060b,roughness:.22,metalness:.3,envMapIntensity:.12,transparent:true,opacity:.8}));
+const road=new THREE.Mesh(new THREE.PlaneGeometry(240,60),new THREE.MeshBasicMaterial({color:0x05060b,transparent:true,opacity:.8}));
 road.rotation.x=-Math.PI/2;road.renderOrder=1;scene.add(road);
 const NEON=[0x27e4ff,0xff2bd6];
 const strips=[];
@@ -55,7 +55,7 @@ const wc=document.createElement('canvas');wc.width=128;wc.height=256;const w2=wc
 for(let y=4;y<252;y+=12)for(let x=4;x<124;x+=12)if(Math.random()<.16){w2.fillStyle=['#ffd27a','#7fe9ff','#ff8adf','#ffffff'][Math.random()*4|0];w2.fillRect(x,y,7,8)}
 const wt=new THREE.CanvasTexture(wc);wt.colorSpace=THREE.SRGBColorSpace;wt.magFilter=THREE.NearestFilter;
 for(let i=0;i<18;i++){const h=24+Math.random()*40,w=7+Math.random()*7,t=wt.clone();t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(Math.ceil(w/2.4),Math.ceil(h/5));t.needsUpdate=true;
- const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,6),new THREE.MeshBasicMaterial({map:t,color:0x5a6070}));b.position.set(i*7.5-65,h/2,-40-Math.random()*18);scene.add(b);movers.push({o:b,x:i*7.5-65,p:.28,w:135})}
+ const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,6),new THREE.MeshBasicMaterial({map:t,color:0x9098aa}));b.position.set(i*7.5-65,h/2,-40-Math.random()*18);scene.add(b);movers.push({o:b,x:i*7.5-65,p:.28,w:135})}
 // speed streaks
 const streaks=[];for(let i=0;i<46;i++){const m=new THREE.Mesh(new THREE.BoxGeometry(1,.025,.025),new THREE.MeshBasicMaterial({color:new THREE.Color(NEON[i%2]).multiplyScalar(3),transparent:true,opacity:0}));m.position.set(Math.random()*80-40,.4+Math.random()*7,-6+Math.random()*12);scene.add(m);streaks.push(m)}
 
@@ -63,7 +63,7 @@ const streaks=[];for(let i=0;i<46;i++){const m=new THREE.Mesh(new THREE.BoxGeome
 const paint=new THREE.MeshPhysicalMaterial({color:PAINT[0],metalness:.55,roughness:.3,clearcoat:1,clearcoatRoughness:.03,envMapIntensity:2.6});
 const detail=new THREE.MeshStandardMaterial({color:0xe6e8ee,metalness:1,roughness:.28});
 const glass=new THREE.MeshPhysicalMaterial({color:0x101218,metalness:.2,roughness:0,transparent:true,opacity:.55,clearcoat:1});
-const car=new THREE.Group();car.position.set(0,0,-.2);car.scale.setScalar(1.4);scene.add(car);const IDLE=Math.PI/2-.5,RUN=Math.PI/2;
+const car=new THREE.Group();car.position.set(0,0,-.2);car.scale.setScalar(1.4);scene.add(car);const RUN=-Math.PI/2,IDLE=RUN-.5;   // the model faces -z
 const wheels=[];let flames=[];
 const draco=new DRACOLoader(mgr);draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/');
 const gl=new GLTFLoader(mgr);gl.setDRACOLoader(draco);
@@ -73,16 +73,14 @@ gl.load('assets/ferrari.glb',g=>{
  const m=g.scene;skin(m);car.add(m);
  const mirror=m.clone(true);skin(mirror);mirror.scale.y=-1;car.add(mirror);
  const sh=new THREE.Mesh(new THREE.PlaneGeometry(.655*4,1.3*4),new THREE.MeshBasicMaterial({map:ao,blending:THREE.MultiplyBlending,toneMapped:false,transparent:true,premultipliedAlpha:true}));sh.rotation.x=-Math.PI/2;sh.position.y=.02;sh.renderOrder=3;car.add(sh);
- const lamp=(x,y,z,c,r)=>{const s=new THREE.Mesh(new THREE.SphereGeometry(r,12,10),new THREE.MeshBasicMaterial({color:new THREE.Color(c).multiplyScalar(1.6)}));s.position.set(x,y,z);car.add(s)};
- for(const x of [-.62,.62]){lamp(x,.72,2.08,0xdff1ff,.07);lamp(x,.86,-2.2,0xff1a1a,.075)}
- for(const x of [-.25,.25]){const f=new THREE.Mesh(new THREE.ConeGeometry(.14,1.5,16,1,true),new THREE.MeshBasicMaterial({color:new THREE.Color(0x4fb8ff).multiplyScalar(1.6),transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));f.rotation.x=Math.PI/2+Math.PI;f.position.set(x,.42,-2.95);f.visible=false;car.add(f);flames.push(f)}
+ for(const x of [-.25,.25]){const f=new THREE.Mesh(new THREE.ConeGeometry(.14,1.5,16,1,true),new THREE.MeshBasicMaterial({color:new THREE.Color(0x4fb8ff).multiplyScalar(1.6),transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));f.rotation.x=Math.PI/2;f.position.set(x,.42,3);f.visible=false;car.add(f);flames.push(f)}
 });
 car.rotation.y=IDLE;
 mgr.onLoad=()=>{const b=$('act');b.disabled=false;b.textContent='START'};
 
 // ---------- ten-frame nitro tank
 const cellG=new RoundedBoxGeometry(1,.62,.3,4,.12);
-const OFF=0x10182c,GOLD=new THREE.Color(0xffa600).multiplyScalar(1.05),BLUE=new THREE.Color(0x12c8ff).multiplyScalar(1.05);
+const OFF=0x10182c,GOLD=new THREE.Color(0xffa600).multiplyScalar(1.05),BLUE=new THREE.Color(0x0090ff);
 const tank=new THREE.Group();tank.position.set(0,5.05,-4);scene.add(tank);
 const frame=new THREE.Mesh(new RoundedBoxGeometry(6.2,1.95,.2,3,.12),new THREE.MeshStandardMaterial({color:0x0a0e1c,metalness:.7,roughness:.3}));frame.position.z=-.18;tank.add(frame);
 const edge=new THREE.Mesh(new RoundedBoxGeometry(6.32,2.07,.1,3,.12),new THREE.MeshBasicMaterial({color:new THREE.Color(0x27e4ff).multiplyScalar(1.6)}));edge.position.z=-.3;tank.add(edge);
