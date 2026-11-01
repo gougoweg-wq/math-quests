@@ -14,7 +14,7 @@ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.
 document.body.prepend(renderer.domElement);
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x05090d);
 const cam=new THREE.PerspectiveCamera(36,innerWidth/innerHeight,.1,60);
-function fit(){const a=innerWidth/innerHeight,k=Math.max(1,1.25/a);cam.aspect=a;cam.position.set(0,5.6*k,14.5*k);cam.lookAt(0,3.1,0);cam.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
+function fit(){const a=innerWidth/innerHeight,k=Math.max(1,1.25/a);cam.aspect=a;cam.position.set(0,6.6*k,20*k);cam.lookAt(0,3.9,0);cam.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
 fit();addEventListener('resize',fit);
 const mgr=new THREE.LoadingManager();mgr.onLoad=()=>{$('act').disabled=false;$('act').textContent='Начать'};
 new RGBELoader(mgr).load('../nitro/assets/city.hdr',t=>{t.mapping=THREE.EquirectangularReflectionMapping;const p=new THREE.PMREMGenerator(renderer);scene.environment=p.fromEquirectangular(t).texture;scene.environmentIntensity=1.6;t.dispose();p.dispose()});
@@ -30,14 +30,14 @@ const plate=new THREE.Mesh(new THREE.CylinderGeometry(2.5,2.6,.3,64),new THREE.M
 // стакан с делениями
 const RAD=2,HT=6.4;
 const pts=[[RAD-.06,.34],[RAD,.42],[RAD,HT],[RAD+.06,HT+.06]].map(p=>new THREE.Vector2(...p));
-const glass=new THREE.Mesh(new THREE.LatheGeometry(pts,72),new THREE.MeshPhysicalMaterial({color:0xffffff,metalness:0,roughness:.03,transmission:1,thickness:.12,ior:1.45,transparent:true,opacity:.34,side:THREE.DoubleSide,envMapIntensity:1.6}));scene.add(glass);
+const glass=new THREE.Mesh(new THREE.LatheGeometry(pts,72),new THREE.MeshPhysicalMaterial({color:0xdfeff5,metalness:0,roughness:.04,clearcoat:1,transparent:true,opacity:.2,depthWrite:false,side:THREE.DoubleSide,envMapIntensity:2.4}));scene.add(glass);
 const base=new THREE.Mesh(new THREE.CylinderGeometry(RAD,RAD,.1,72),new THREE.MeshPhysicalMaterial({color:0xffffff,roughness:.05,transparent:true,opacity:.3}));base.position.y=.36;scene.add(base);
 const yOf=m=>.4+m/MAX*(HT-.9);
 const c=document.createElement('canvas');c.width=512;c.height=1024;const g=c.getContext('2d');g.clearRect(0,0,512,1024);g.fillStyle='#ffffffd0';g.font='bold 40px Arial';
 for(let m=0;m<=500;m+=50){const y=1024-(m/MAX)*1024*(HT-.9)/HT-1024*.4/HT;g.fillRect(40,y,m%100?44:78,m%100?4:6);if(m%100==0&&m)g.fillText(m,134,y+14)}
 const lab=new THREE.Mesh(new THREE.CylinderGeometry(RAD+.02,RAD+.02,HT,72,1,true,-.9,1.8),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));lab.position.y=HT/2;scene.add(lab);
 // жидкость
-const liqM=new THREE.MeshPhysicalMaterial({color:0x18a0ff,roughness:.06,metalness:0,transparent:true,opacity:.72,clearcoat:1});
+const liqM=new THREE.MeshPhysicalMaterial({color:0x18a0ff,roughness:.06,metalness:0,transparent:true,opacity:.82,clearcoat:1,envMapIntensity:1.4});
 const liq=new THREE.Mesh(new THREE.CylinderGeometry(RAD-.08,RAD-.08,1,72),liqM);scene.add(liq);
 const topD=new THREE.Mesh(new THREE.CircleGeometry(RAD-.08,72),new THREE.MeshPhysicalMaterial({color:0x8fdcff,roughness:.05,transparent:true,opacity:.6}));topD.rotation.x=-Math.PI/2;scene.add(topD);
 // кран и струя
