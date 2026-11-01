@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Nitro Ten</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#04050c;color:#eaf6ff;font:700 22px/1.15 "Exo 2",system-ui,sans-serif;user-select:none;-webkit-user-select:none;touch-action:none}
+canvas{position:fixed;inset:0;display:block}
+#hud{position:fixed;inset:0;pointer-events:none}
+#eq{position:absolute;top:12px;left:50%;transform:translateX(-50%);padding:6px 28px;font:900 clamp(34px,7vw,60px) Orbitron,sans-serif;white-space:nowrap;background:linear-gradient(#0a1020d9,#0a102088);border-bottom:3px solid #27e4ff;box-shadow:0 0 26px #27e4ff66;border-radius:6px}
+#eq i{font-style:normal;color:#27e4ff;text-shadow:0 0 14px #27e4ff}#eq b{color:#ffc62e;text-shadow:0 0 14px #ffc62e}
+#say{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#0a1020cc;border:1px solid #27e4ff55;border-radius:8px;padding:8px 18px;font-size:clamp(19px,3.2vw,26px);white-space:nowrap;max-width:96vw;text-align:center}
+#stars{position:absolute;top:16px;left:16px;font:900 24px Orbitron,sans-serif;color:#ffc62e;text-shadow:0 0 10px #ffc62e}
+#snd{position:absolute;top:14px;right:14px;pointer-events:auto;border:1px solid #ffffff44;background:#0a1020aa;border-radius:6px;padding:7px 11px;font:inherit;font-size:16px;color:inherit;cursor:pointer}
+#next{position:absolute;bottom:66px;left:50%;transform:translateX(-50%);pointer-events:auto;border:0;border-radius:6px;background:linear-gradient(#ff5a1f,#e0102e);color:#fff;font:900 clamp(22px,3.6vw,30px) Orbitron,sans-serif;padding:13px 40px;box-shadow:0 0 28px #ff3a1f99;cursor:pointer}
+#ov{position:fixed;inset:0;display:grid;place-items:center;background:#04050caa;padding:16px;z-index:5}
+#box{background:#0a1020ee;border-top:4px solid #27e4ff;border-radius:8px;padding:22px 30px;text-align:center;max-width:540px;box-shadow:0 0 50px #27e4ff44}
+#box h1{margin:0 0 8px;font:900 clamp(38px,8vw,60px) Orbitron,sans-serif;background:linear-gradient(90deg,#27e4ff,#ff2bd6);-webkit-background-clip:text;background-clip:text;color:transparent}
+#box p{margin:6px 0;font-size:23px}#box small{display:block;margin-top:12px;font-size:13px;opacity:.6}
+#act{margin-top:12px;border:0;border-radius:6px;background:linear-gradient(#ff5a1f,#e0102e);color:#fff;font:900 28px Orbitron,sans-serif;padding:12px 44px;box-shadow:0 0 28px #ff3a1f99;cursor:pointer}#act:disabled{background:#2a3350;box-shadow:none;color:#8b97b5}
+[hidden]{display:none!important}
+</style></head><body>
+<div id="hud"><div id="stars"></div><button id="snd" type="button">Sound on</button><div id="eq"></div><div id="say"></div><button id="next" type="button" hidden>Show me</button></div>
+<div id="ov"><div id="box"><h1>NITRO TEN</h1><p>Fill the tank with exactly 10.</p><p>Tap a gap to cut the blue nitro row.</p><button id="act" type="button" disabled>Loading…</button><small>Car model by vicent091036</small></div></div>
+<script type="module" src="game.js?v=1"></script>
+</body></html>
