@@ -163,7 +163,7 @@ function cast() {
           burst(qx, qy, 50, ['#4dff88', '#c6ffd6']); shake = 10; lives--;
           lives$();
           if (lives <= 0) setTimeout(lose, 900);
-          else { sel = []; [...$('cards').children].forEach(c => c.classList.remove('sel', 's1')); $('cast').disabled = true; drawBar(); busy = false; }
+          else { sel = []; [...$('cards').children].forEach(c => c.classList.remove('sel', 's1')); $('cast').disabled = true; busy = false; }
         }, 380);
       }, 450);
       hud();
@@ -325,7 +325,8 @@ function frame(now) {
 function drawShield(t) {
   const [x, y] = shieldPos();
   const R = Math.min(78, H * .1, W * .11);
-  if (shieldBreak > 0) { shieldBreak -= .02; if (shieldBreak <= 0) return; ctx.globalAlpha = shieldBreak; }
+  if (shieldBreak < 0) return;
+  if (shieldBreak > 0) { shieldBreak -= .02; if (shieldBreak <= 0) { shieldBreak = -1; return; } ctx.globalAlpha = shieldBreak; }
   const sc = shieldBreak > 0 ? 1 + (1 - shieldBreak) * .6 : 1;
   ctx.save(); ctx.translate(x, y); ctx.scale(sc, sc);
   glow(0, 0, R * 1.9, 'rgba(140,110,255,A)', .35);
