@@ -1,0 +1,29 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Добыча пиратов</title><link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Exo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;color:#fff4dc;font:800 20px "Exo 2",system-ui,sans-serif;user-select:none;touch-action:manipulation;background:radial-gradient(ellipse at 50% 0,#3a6b8f,#0d2236 70%)}
+#deck{position:fixed;left:0;right:0;bottom:0;height:62%;background:repeating-linear-gradient(90deg,#7a4a24 0 70px,#6a3e1d 70px 72px),#7a4a24;box-shadow:inset 0 30px 40px #0007}
+#top{position:fixed;top:10px;left:50%;transform:translateX(-50%);text-align:center;width:min(760px,94vw);z-index:2}
+#ord{font:400 clamp(28px,5.4vw,44px) "Pirata One",serif;background:#f2e2b8;color:#3a2210;border-radius:6px;padding:6px 18px;box-shadow:0 6px 0 #0005;display:inline-block}
+#ord b{color:#a3201a}#say{margin-top:8px;font-size:clamp(17px,2.8vw,22px);text-shadow:0 2px 6px #000}
+#piles{position:fixed;left:3vw;right:3vw;top:clamp(150px,27vh,200px);bottom:96px;display:flex;gap:10px;justify-content:center;align-items:flex-end;z-index:2}
+.p{flex:1;max-width:120px;display:flex;flex-wrap:wrap-reverse;align-content:flex-start;justify-content:center;gap:2px;padding:8px 4px;border:3px solid #0000;border-radius:10px;cursor:pointer;min-height:60px;transition:transform .15s,border-color .15s;background:#0002}
+.p.on{border-color:#ffd24a;background:#ffd24a33;transform:translateY(-10px)}.p.bad{border-color:#ff5a4a}
+.c{width:clamp(14px,2.2vw,22px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3a8,#f2b31b 50%,#9a6a08);box-shadow:0 1px 0 #5a3d05}
+.lab{width:100%;text-align:center;font-size:15px;color:#ffe9a8}
+#bar{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:#1a0f06d9;padding:8px 10px;border-radius:10px;z-index:3}
+button{font:800 22px "Exo 2";border:0;border-radius:8px;height:54px;min-width:54px;color:#3a2210;background:linear-gradient(#ffe08a,#e2a92a);cursor:pointer}#n{min-width:150px;text-align:center;font-size:20px}#take{padding:0 22px;background:linear-gradient(#7be08a,#2a9a4a);color:#fff}
+#gold{position:fixed;top:12px;right:14px;font:400 30px "Pirata One",serif;color:#ffd24a;z-index:3}
+#ov{position:fixed;inset:0;display:grid;place-items:center;background:#0009;z-index:9;padding:14px}#bx{background:#f2e2b8;color:#3a2210;border-radius:10px;padding:20px 28px;text-align:center;max-width:480px}#bx h1{margin:0 0 6px;font:400 46px "Pirata One",serif;color:#a3201a}#bx p{margin:5px 0}#bx button{margin-top:10px;padding:0 30px}[hidden]{display:none!important}</style></head><body>
+<div id="deck"></div><div id="gold">0 ☠</div><div id="top"><div id="ord"></div><div id="say"></div></div><div id="piles"></div>
+<div id="bar"><button id="m">−</button><div id="n"></div><button id="p">+</button><button id="take">Забрать</button></div>
+<div id="ov"><div id="bx"><h1>Добыча пиратов</h1><p>Капитан говорит, какая часть сундука твоя.</p><p>1. Раздели монеты на равные кучки кнопками − и +.</p><p>2. Выбери столько кучек, сколько велено, и забери.</p><button id="go">На абордаж!</button></div></div>
+<script>
+const R=[[20,3,4],[30,2,5],[60,7,10],[28,3,4],[40,5,8],[25,3,5],[36,5,9],[64,3,8]];let r=0,k=1,sel=new Set(),gold=0,tries=0;const $=i=>document.getElementById(i);
+function draw(){const[N,a,b]=R[r],box=$('piles');box.innerHTML='';const eq=N%k===0,per=Math.floor(N/k);$('n').textContent=k===1?'1 сундук':k+' кучек';
+for(let i=0;i<k;i++){const d=document.createElement('div');d.className='p'+(sel.has(i)?' on':'');const cnt=eq?per:(i<N%k?per+1:per);for(let j=0;j<cnt;j++){const c=document.createElement('i');c.className='c';d.append(c)}const l=document.createElement('div');l.className='lab';l.textContent=cnt;d.append(l);d.onclick=()=>{sel.has(i)?sel.delete(i):sel.add(i);draw()};box.append(d)}
+if(!eq)$('say').textContent='Кучки неравные: '+N+' не делится на '+k+'. Капитан не одобрит.';else $('say').textContent=sel.size?'Выбрано кучек: '+sel.size+', монет: '+sel.size*per:'Раздели на равные кучки и выбери свою долю.'}
+function start(){const[N,a,b]=R[r];k=1;sel.clear();tries=0;$('ord').innerHTML='Твоя доля: <b>'+a+'/'+b+'</b> от '+N+' монет';draw()}
+$('m').onclick=()=>{if(k>1){k--;sel.clear();draw()}};$('p').onclick=()=>{if(k<12){k++;sel.clear();draw()}};
+$('take').onclick=()=>{const[N,a,b]=R[r],per=N/k;if(N%k||k!==b){tries++;$('say').textContent=N%k?'Сначала равные кучки!':'Знаменатель '+b+': на сколько кучек делим сундук?';return}if(sel.size!==a){tries++;$('say').textContent='Числитель '+a+': сколько кучек берём?';document.querySelectorAll('.p').forEach(e=>e.classList.add('bad'));setTimeout(draw,600);return}
+const got=a*per;gold+=got;$('gold').textContent=gold+' ☠';$('say').textContent=a+'/'+b+' от '+N+' = '+N+' : '+b+' · '+a+' = '+got+' монет!';$('take').disabled=true;setTimeout(()=>{$('take').disabled=false;r++;if(r<R.length)start();else{$('ov').hidden=false;$('bx').innerHTML='<h1>Сундук поделён!</h1><p>Твоя добыча: '+gold+' монет</p><button onclick="location.reload()">Ещё раз</button>'}},1900)};
+$('go').onclick=()=>{$('ov').hidden=true;start()};window.__g={get r(){return r},get gold(){return gold},setK:v=>{k=v;sel.clear();draw()},pick:a=>{sel=new Set(a);draw()}};
+</script></body></html>
