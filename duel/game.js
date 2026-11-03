@@ -77,7 +77,7 @@ function hud() {
 
 function startRound() {
   cur = makeRound(round); sel = []; solved = false; shieldBreak = 0;
-  $('next').hidden = true; $('cast').hidden = false; $('hint').hidden = false;
+  $('next').hidden = true; $('cast').hidden = false; $('cast').disabled = true; $('hint').hidden = false;
   $('task').innerHTML = cur.sub
     ? `Твоя руна ${frHTML(cur.A)} уже ударила. Какая руна снимет остаток щита <b>${fs(cur.T)}</b>?`
     : `Выбери <b>две</b> руны, которые вместе дают ровно <b>${fs(cur.T)}</b>`;

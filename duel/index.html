@@ -15,7 +15,7 @@ canvas{position:fixed;inset:0;display:block}
 #bar .s{flex:1;border-right:1px solid #0b082277;transition:background .25s}
 #bar .s.a{background:linear-gradient(#7fb2ff,#3d6fe0)}#bar .s.b{background:linear-gradient(#ffe08a,#e0a530)}#bar .s.c{background:linear-gradient(#b7a6ff,#7a5cf0)}
 #mark{position:absolute;top:-7px;bottom:-7px;width:4px;margin-left:-2px;background:#ff5d8f;box-shadow:0 0 10px #ff5d8f;border-radius:2px;transition:left .3s}
-#mark span{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:12px;color:#ff9dbb;white-space:nowrap}
+#mark span{display:none;position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:12px;color:#ff9dbb;white-space:nowrap}
 #eq{min-height:24px;font-size:17px;color:#cfc3ff}#eq b{color:#fff}
 #cards{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:8px}
 .card{width:86px;height:112px;border:0;border-radius:9px;cursor:pointer;background:radial-gradient(circle at 50% 30%,#fff6dc,#e8d3a0 70%,#c9a868);color:#2b1a08;box-shadow:0 4px 0 #8a6a2e,0 0 0 2px #6b4f1f inset;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s;font-family:Cinzel,serif;position:relative}
@@ -55,5 +55,5 @@ canvas{position:fixed;inset:0;display:block}
 <p>Собери из рун заклинание <b>ровно</b> такой же силы.</p>
 <p>Больше — заклинание отразится в тебя. Меньше — щит устоит.</p>
 <button id="start" type="button">Начать дуэль</button></div></div>
-<script src="game.js?v=2"></script>
+<script src="game.js?v=3"></script>
 </body></html>
