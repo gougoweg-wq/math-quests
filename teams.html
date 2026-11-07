@@ -1,0 +1,50 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pick the Teams</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#0b3d1f;color:#f1fff4;font:700 18px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;user-select:none;display:flex;flex-direction:column;align-items:center}
+header{width:100%;max-width:860px;display:flex;justify-content:space-between;padding:14px 16px}h1{margin:0;font-size:22px;color:#ffe066}.stat{color:#b7f5c8}
+#task{font-size:26px;text-align:center;padding:4px 16px 10px}#task em{font-style:normal;color:#ffe066}
+#pitch{width:calc(100% - 32px);max-width:860px;min-height:230px;border-radius:18px;background:#14823f;border:4px solid #e9fbe9;position:relative;padding:16px;display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+#pitch:before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:3px solid #e9fbe988}
+.pl{width:40px;height:40px;border-radius:50%;background:#fff;color:#0b3d1f;display:flex;align-items:center;justify-content:center;font-size:20px;position:relative;z-index:1;transition:background .25s,transform .25s}
+.pl.in{transform:scale(1.15)}.pl.bench{background:#9ca3af;color:#333}
+#bench{width:calc(100% - 32px);max-width:860px;margin-top:10px;min-height:56px;border-radius:12px;background:#5b3a1e;padding:8px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}#bench span{color:#ffd8a8;margin-right:8px}
+#ctrl{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;margin:16px}
+.st{display:flex;flex-direction:column;align-items:center;gap:6px}.st label{color:#b7f5c8}.st div{display:flex;align-items:center;gap:10px}
+.st button{width:46px;height:46px;font-size:26px;border-radius:12px;border:0;background:#e9fbe9;color:#0b3d1f;cursor:pointer}.st output{min-width:46px;text-align:center;font-size:32px}
+#go{font:800 22px system-ui;background:#ffe066;color:#222;border:0;border-radius:14px;padding:14px 34px;cursor:pointer}
+#msg{min-height:34px;text-align:center;padding:0 16px;font-size:20px}
+.ok{color:#ffe066}.no{color:#ffb4a2}
+</style></head><body>
+<header><h1>Pick the Teams</h1><span class="stat" id="rd"></span><span class="stat" id="sc"></span></header>
+<div id="task"></div>
+<div id="pitch"></div>
+<div id="bench"><span>BENCH</span></div>
+<div id="ctrl"></div>
+<button id="go">WHISTLE!</button>
+<div id="msg"></div>
+<script>
+const R=[{n:12,k:4},{n:13,k:5},{n:17,k:3},{n:22,k:2},{n:19,k:4},{n:26,k:5},{n:23,k:5},{n:30,k:4},{n:14,k:3},{n:25,k:6,bus:1},{n:20,k:6,bus:1}];
+const COL=['#ff6b6b','#4dabf7','#ffd43b','#b197fc','#ff922b','#63e6be','#f783ac','#a9e34b','#74c0fc','#ffa8a8','#e599f7'];
+let r=0,score=0,a={t:0,b:0},busy=false;const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(s=>setTimeout(s,ms));
+function stepper(key,label){return `<div class="st"><label>${label}</label><div><button data-k="${key}" data-d="-1">−</button><output id="o_${key}">0</output><button data-k="${key}" data-d="1">+</button></div></div>`}
+function load(){const q=R[r];a={t:0,b:0};busy=false;$('msg').textContent='';
+$('rd').textContent=`Play ${r+1}/${R.length}`;$('sc').textContent=`Score ${score}`;
+$('task').innerHTML=q.bus?`<em>${q.n}</em> kids. A minibus has <em>${q.k}</em> seats. How many minibuses do we need?`:`<em>${q.n}</em> players. Teams of <em>${q.k}</em>. How many full teams? How many on the bench?`;
+$('pitch').innerHTML='';for(let i=0;i<q.n;i++){const p=document.createElement('div');p.className='pl';p.textContent='●';$('pitch').appendChild(p)}
+$('bench').innerHTML='<span>'+(q.bus?'LEFT OVER':'BENCH')+'</span>';
+$('ctrl').innerHTML=q.bus?stepper('t','Minibuses'):stepper('t','Teams')+stepper('b','Bench');
+document.querySelectorAll('.st button').forEach(b=>b.onclick=()=>{if(busy)return;const k=b.dataset.k;a[k]=Math.max(0,Math.min(40,a[k]+ +b.dataset.d));$('o_'+k).textContent=a[k]})}
+async function whistle(){if(busy)return;const q=R[r];const T=Math.floor(q.n/q.k),B=q.n%q.k;
+if(!q.bus&&a.b>=q.k){$('msg').innerHTML=`<span class="no">Bench has ${a.b} — that is enough for another team of ${q.k}! Fix it.</span>`;return}
+busy=true;const ps=[...document.querySelectorAll('.pl')];
+for(let t=0;t<T;t++){for(let j=0;j<q.k;j++){const p=ps[t*q.k+j];p.style.background=COL[t%COL.length];p.textContent=t+1;p.classList.add('in')}await sleep(380)}
+for(let j=T*q.k;j<q.n;j++){const p=ps[j];p.classList.add('bench');p.textContent='';$('bench').appendChild(p);await sleep(200)}
+let ok,txt;
+if(q.bus){const need=T+(B?1:0);ok=a.t===need;txt=`${q.n} ÷ ${q.k} = ${T} r ${B}`+(B?` → ${T} buses are full, ${B} kid${B>1?'s':''} left → we need ${need}!`:` → exactly ${need}`);}
+else{ok=a.t===T&&a.b===B;txt=`${q.n} ÷ ${q.k} = ${T} r ${B}`}
+if(ok){score+=10;$('msg').innerHTML=`<span class="ok">GOAL! ${txt}</span>`}else{$('msg').innerHTML=`<span class="no">Not this time: ${txt}</span>`}
+$('sc').textContent=`Score ${score}`;$('go').textContent=r+1<R.length?'NEXT PLAY':'FINAL WHISTLE';$('go').onclick=next}
+function next(){if(r+1<R.length){r++;$('go').textContent='WHISTLE!';$('go').onclick=whistle;load()}else{$('task').innerHTML=`Full time! Score <em>${score}</em> / ${R.length*10}`;$('pitch').innerHTML='';$('ctrl').innerHTML='';$('bench').innerHTML='';$('msg').textContent='';$('go').textContent='PLAY AGAIN';$('go').onclick=()=>{r=0;score=0;$('go').textContent='WHISTLE!';$('go').onclick=whistle;load()}}}
+$('go').onclick=whistle;load();
+</script></body></html>
