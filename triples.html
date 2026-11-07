@@ -25,7 +25,7 @@ const L2=[['1','5','0.2','20%'],['2','5','0.4','40%'],['3','10','0.3','30%'],['7
 const L3=[['1','8','0.125','12.5%'],['3','8','0.375','37.5%'],['3','20','0.15','15%'],['1','20','0.05','5%'],['9','10','0.9','90%'],['1','25','0.04','4%']];
 const L4=[['6','8','0.75','75%'],['18','24','0.75','75%'],['12','40','0.3','30%'],['9','12','0.75','75%'],['14','20','0.7','70%'],['2','8','0.25','25%']];
 const LEVELS=[{n:'Warm-up',t:L1},{n:'Fifths & tenths',t:L2},{n:'Tricky ones',t:L3},{n:'Boss: not simplified!',t:L4.filter((x,i)=>i!==3&&i!==1)}];
-let lv=0,score=0,miss=0,sel=[],left=0,streak=0;
+let intro=true,lv=0,score=0,miss=0,sel=[],left=0,streak=0;
 const $=id=>document.getElementById(id);
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
 function start(){const T=LEVELS[lv].t;const cards=[];T.forEach((t,i)=>{const v=parseFloat(t[2]);cards.push({k:'f',v,h:`<span class="frac">${t[0]}<b>${t[1]}</b></span>`},{k:'d',v,h:t[2]},{k:'p',v,h:t[3]})});
@@ -42,6 +42,6 @@ else{streak=0;miss++;score=Math.max(0,score-3);s.forEach(x=>{x.classList.remove(
 function win(){const st=miss===0?3:miss<=2?2:1;$('bt').textContent='★'.repeat(st)+'☆'.repeat(3-st);
 $('bp').textContent=lv+1<LEVELS.length?`Level ${lv+1} cleared with ${miss} mistake${miss===1?'':'s'}.`:`All levels done! Final score: ${score}`;
 $('bb').textContent=lv+1<LEVELS.length?'NEXT LEVEL':'PLAY AGAIN';$('box').style.display='flex'}
-$('bb').onclick=()=>{$('box').style.display='none';if(lv+1<LEVELS.length)lv++;else{lv=0;score=0}start()};
+$('bb').onclick=()=>{$('box').style.display='none';if(intro){intro=false;start();return}if(lv+1<LEVELS.length)lv++;else{lv=0;score=0}start()};
 $('bt').textContent='Triple Match';$('bp').textContent='Tap a fraction, a decimal and a percentage that are equal. Wrong triple = −3 points. Matches in a row = combo!';$('box').style.display='flex';
 </script></body></html>
